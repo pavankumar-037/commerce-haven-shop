@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { X, Gift, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,73 +11,87 @@ interface ComboOffersProps {
 const comboOffers = [
   {
     id: 1,
-    title: "Women's Fashion Complete Set",
-    description: "Mix & Match - Dress, Shoes & Accessories",
+    title: "Premium Men's Ethnic Collection",
+    description: "Complete Kurta Set + Bandhgala Jacket + Ethnic Mojaris",
     products: [
-      { id: 1, name: "Green Floral Maxi Dress", price: 2299, image: "/lovable-uploads/96263624-bbc8-400e-8bef-222f59cba99a.png" },
-      { id: 21, name: "Ethnic Juttis", price: 799, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop" },
-      { id: 26, name: "Silk Dupatta", price: 599, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=200&h=200&fit=crop" }
+      { id: 1, name: "Cream Silk Kurta Pajama Set", price: 2299, image: "/lovable-uploads/c2e7033c-24d2-4791-8ec2-f68e1ea2b10d.png" },
+      { id: 3, name: "Black Embroidered Bandhgala Jacket", price: 3999, image: "/lovable-uploads/ae3e315a-93ba-47e1-800c-7c311334004f.png" },
+      { id: 39, name: "Gold Ethnic Mojaris", price: 899, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop" }
     ],
-    totalPrice: 3697,
-    offerPrice: 2499,
-    savings: 1198,
-    badge: "BESTSELLER"
-  },
-  {
-    id: 2,
-    title: "Couple's Traditional Combo",
-    description: "His & Her ethnic wear with matching accessories",
-    products: [
-      { id: 11, name: "Men's Cotton Kurta Set", price: 1299, image: "https://images.unsplash.com/photo-1622445275576-721325763eda?w=200&h=200&fit=crop" },
-      { id: 10, name: "Traditional Lehenga", price: 5999, image: "/lovable-uploads/895d725f-a8e9-4e50-999d-703d9fc6523a.png" },
-      { id: 29, name: "Men's Ethnic Mojaris", price: 899, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop" }
-    ],
-    totalPrice: 8197,
-    offerPrice: 5999,
+    totalPrice: 7197,
+    offerPrice: 4999,
     savings: 2198,
     badge: "WEDDING SPECIAL"
   },
   {
-    id: 3,
-    title: "Modern Western Combo",
-    description: "Trendy western wear collection",
+    id: 2,
+    title: "Women's Elegant Saree Collection",
+    description: "Designer Sarees with Matching Accessories",
     products: [
-      { id: 2, name: "Pink Floral Mini Dress", price: 1599, image: "/lovable-uploads/af1bcb88-3340-4c04-9e9e-beba1e570e8f.png" },
-      { id: 4, name: "Red Bodycon Dress", price: 2499, image: "/lovable-uploads/a8ceae1e-c31e-4874-9a53-b50afb591439.png" },
-      { id: 22, name: "High Heel Sandals", price: 1599, image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=200&h=200&fit=crop" }
+      { id: 6, name: "Red Embellished Silk Saree", price: 4999, image: "/lovable-uploads/2372473d-64a9-48f6-99ec-5917a66a92eb.png" },
+      { id: 7, name: "Pink Floral Print Saree", price: 3299, image: "/lovable-uploads/40f75af7-ae2f-4195-b3e4-baa86dd15ae0.png" },
+      { id: 8, name: "Embroidered Ethnic Juttis", price: 1299, image: "/lovable-uploads/393faa61-dd05-4565-aeb5-60c78d4e41d8.png" }
     ],
-    totalPrice: 5697,
-    offerPrice: 3999,
-    savings: 1698,
+    totalPrice: 9597,
+    offerPrice: 6999,
+    savings: 2598,
+    badge: "FESTIVE COLLECTION"
+  },
+  {
+    id: 3,
+    title: "Women's Western Style Combo",
+    description: "Trendy Dresses with Designer Footwear",
+    products: [
+      { id: 11, name: "Green Floral Maxi Dress", price: 2299, image: "/lovable-uploads/96263624-bbc8-400e-8bef-222f59cba99a.png" },
+      { id: 14, name: "Red Bodycon Dress", price: 2499, image: "/lovable-uploads/a8ceae1e-c31e-4874-9a53-b50afb591439.png" },
+      { id: 10, name: "Golden Ethnic Heel Sandals", price: 1899, image: "/lovable-uploads/5f02022c-a6ed-4863-b35e-1b4a01f97feb.png" }
+    ],
+    totalPrice: 6697,
+    offerPrice: 4699,
+    savings: 1998,
     badge: "PARTY READY"
   },
   {
     id: 4,
-    title: "Saree & Accessories Bundle",
-    description: "Complete saree collection with matching items",
+    title: "Men's Formal Business Collection",
+    description: "Professional Attire for Office & Business",
     products: [
-      { id: 16, name: "Banarasi Silk Saree", price: 3999, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=200&h=200&fit=crop" },
-      { id: 18, name: "Designer Georgette Saree", price: 2799, image: "https://images.unsplash.com/photo-1594736797933-d0301ba9d3be?w=200&h=200&fit=crop" },
-      { id: 24, name: "Kolhapuri Chappals", price: 599, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop" }
+      { id: 5, name: "Grey Formal Business Suit", price: 4999, image: "/lovable-uploads/ff04eeff-522e-4202-a3e2-ae9322175cc8.png" },
+      { id: 2, name: "Peach Silk Traditional Kurta", price: 1899, image: "/lovable-uploads/7aa55311-3e54-4b8d-ab49-f69184926f1e.png" },
+      { id: 36, name: "Black Formal Leather Shoes", price: 2299, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop" }
     ],
-    totalPrice: 7397,
-    offerPrice: 4999,
-    savings: 2398,
-    badge: "FESTIVE COLLECTION"
+    totalPrice: 9197,
+    offerPrice: 6499,
+    savings: 2698,
+    badge: "OFFICE READY"
   },
   {
     id: 5,
-    title: "Men's Complete Wardrobe",
-    description: "Ethnic & Western wear with shoes",
+    title: "Women's Casual Chic Bundle",
+    description: "Stylish Tops & Comfortable Footwear",
     products: [
-      { id: 31, name: "Cotton Casual Shirt", price: 899, image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=200&h=200&fit=crop" },
-      { id: 32, name: "Denim Jeans", price: 1599, image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=200&h=200&fit=crop" },
-      { id: 26, name: "Formal Leather Shoes", price: 2299, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop" }
+      { id: 16, name: "Blue Floral Top", price: 999, image: "/lovable-uploads/68ee88a9-24f0-4523-a557-ff040eeb4760.png" },
+      { id: 19, name: "Pink Ruffle Top", price: 1199, image: "/lovable-uploads/b162e3a0-19f8-49d4-b866-a1142d29881a.png" },
+      { id: 9, name: "Designer Ethnic Flats", price: 999, image: "/lovable-uploads/e1f8b2d5-5f8d-4ac1-bdc6-ab5c8b96cd7b.png" }
     ],
-    totalPrice: 4797,
-    offerPrice: 3299,
-    savings: 1498,
-    badge: "OFFICE READY"
+    totalPrice: 3197,
+    offerPrice: 2299,
+    savings: 898,
+    badge: "CASUAL COMFORT"
+  },
+  {
+    id: 6,
+    title: "Kids Festive Special",
+    description: "Complete Traditional Outfit for Kids",
+    products: [
+      { id: 4, name: "Orange Kids Kurta Set", price: 899, image: "/lovable-uploads/13f40017-ba63-4bd7-98ad-f45dc0850d29.png" },
+      { id: 52, name: "Pink Girls Lehenga", price: 1299, image: "https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=200&h=200&fit=crop" },
+      { id: 53, name: "Yellow Kids T-Shirt", price: 399, image: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=200&h=200&fit=crop" }
+    ],
+    totalPrice: 2597,
+    offerPrice: 1799,
+    savings: 798,
+    badge: "KIDS SPECIAL"
   }
 ];
 
