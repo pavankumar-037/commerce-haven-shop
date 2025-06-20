@@ -12,59 +12,73 @@ interface ComboOffersProps {
 const comboOffers = [
   {
     id: 1,
-    title: "Buy 3 Pay for 2",
-    description: "Mix & Match any 3 items from ethnic wear",
+    title: "Women's Fashion Complete Set",
+    description: "Mix & Match - Dress, Shoes & Accessories",
     products: [
-      { id: 1, name: "Cotton Kurta", price: 1299, image: "https://images.unsplash.com/photo-1622445275576-721325763eda?w=200&h=200&fit=crop" },
-      { id: 2, name: "Silk Dupatta", price: 599, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=200&h=200&fit=crop" },
-      { id: 3, name: "Cotton Palazzo", price: 899, image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=200&h=200&fit=crop" }
+      { id: 1, name: "Green Floral Maxi Dress", price: 2299, image: "/lovable-uploads/96263624-bbc8-400e-8bef-222f59cba99a.png" },
+      { id: 21, name: "Ethnic Juttis", price: 799, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop" },
+      { id: 26, name: "Silk Dupatta", price: 599, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=200&h=200&fit=crop" }
     ],
-    totalPrice: 2797,
-    offerPrice: 1898,
-    savings: 899,
+    totalPrice: 3697,
+    offerPrice: 2499,
+    savings: 1198,
     badge: "BESTSELLER"
   },
   {
     id: 2,
-    title: "Couple's Combo",
-    description: "His & Her matching ethnic sets",
+    title: "Couple's Traditional Combo",
+    description: "His & Her ethnic wear with matching accessories",
     products: [
-      { id: 4, name: "Men's Kurta Set", price: 1599, image: "https://images.unsplash.com/photo-1594736797933-d0301ba9d3be?w=200&h=200&fit=crop" },
-      { id: 5, name: "Women's Anarkali", price: 2299, image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=200&h=200&fit=crop" }
+      { id: 11, name: "Men's Cotton Kurta Set", price: 1299, image: "https://images.unsplash.com/photo-1622445275576-721325763eda?w=200&h=200&fit=crop" },
+      { id: 10, name: "Traditional Lehenga", price: 5999, image: "/lovable-uploads/895d725f-a8e9-4e50-999d-703d9fc6523a.png" },
+      { id: 29, name: "Men's Ethnic Mojaris", price: 899, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop" }
     ],
-    totalPrice: 3898,
-    offerPrice: 2999,
-    savings: 899,
-    badge: "ROMANTIC"
+    totalPrice: 8197,
+    offerPrice: 5999,
+    savings: 2198,
+    badge: "WEDDING SPECIAL"
   },
   {
     id: 3,
-    title: "Family Pack",
-    description: "Complete family ethnic wear set",
+    title: "Modern Western Combo",
+    description: "Trendy western wear collection",
     products: [
-      { id: 6, name: "Men's Kurta", price: 1299, image: "https://images.unsplash.com/photo-1622445275576-721325763eda?w=200&h=200&fit=crop" },
-      { id: 7, name: "Women's Kurti", price: 799, image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=200&h=200&fit=crop" },
-      { id: 8, name: "Kids Kurta", price: 799, image: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=200&h=200&fit=crop" },
-      { id: 9, name: "Kids Lehenga", price: 1299, image: "https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=200&h=200&fit=crop" }
+      { id: 2, name: "Pink Floral Mini Dress", price: 1599, image: "/lovable-uploads/af1bcb88-3340-4c04-9e9e-beba1e570e8f.png" },
+      { id: 4, name: "Red Bodycon Dress", price: 2499, image: "/lovable-uploads/a8ceae1e-c31e-4874-9a53-b50afb591439.png" },
+      { id: 22, name: "High Heel Sandals", price: 1599, image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=200&h=200&fit=crop" }
     ],
-    totalPrice: 4196,
-    offerPrice: 2999,
-    savings: 1197,
-    badge: "FAMILY SPECIAL"
+    totalPrice: 5697,
+    offerPrice: 3999,
+    savings: 1698,
+    badge: "PARTY READY"
   },
   {
     id: 4,
-    title: "Western Wear Combo",
-    description: "Complete western wardrobe essentials",
+    title: "Saree & Accessories Bundle",
+    description: "Complete saree collection with matching items",
     products: [
-      { id: 10, name: "Casual Shirt", price: 899, image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=200&h=200&fit=crop" },
-      { id: 11, name: "Denim Jeans", price: 1599, image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=200&h=200&fit=crop" },
-      { id: 12, name: "T-Shirt", price: 699, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop" }
+      { id: 16, name: "Banarasi Silk Saree", price: 3999, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=200&h=200&fit=crop" },
+      { id: 18, name: "Designer Georgette Saree", price: 2799, image: "https://images.unsplash.com/photo-1594736797933-d0301ba9d3be?w=200&h=200&fit=crop" },
+      { id: 24, name: "Kolhapuri Chappals", price: 599, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop" }
     ],
-    totalPrice: 3197,
-    offerPrice: 2399,
-    savings: 798,
-    badge: "TRENDING"
+    totalPrice: 7397,
+    offerPrice: 4999,
+    savings: 2398,
+    badge: "FESTIVE COLLECTION"
+  },
+  {
+    id: 5,
+    title: "Men's Complete Wardrobe",
+    description: "Ethnic & Western wear with shoes",
+    products: [
+      { id: 31, name: "Cotton Casual Shirt", price: 899, image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=200&h=200&fit=crop" },
+      { id: 32, name: "Denim Jeans", price: 1599, image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=200&h=200&fit=crop" },
+      { id: 26, name: "Formal Leather Shoes", price: 2299, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop" }
+    ],
+    totalPrice: 4797,
+    offerPrice: 3299,
+    savings: 1498,
+    badge: "OFFICE READY"
   }
 ];
 
@@ -76,7 +90,7 @@ const ComboOffers = ({ onClose }: ComboOffersProps) => {
     combo.products.forEach(product => {
       addToCart({
         ...product,
-        price: Math.floor(combo.offerPrice / combo.products.length), // Distribute offer price
+        price: Math.floor(combo.offerPrice / combo.products.length),
         category: "Combo Offer",
         rating: 4.5,
         description: `Part of ${combo.title}`
@@ -92,9 +106,9 @@ const ComboOffers = ({ onClose }: ComboOffersProps) => {
           <div>
             <h2 className="text-2xl font-bold text-primary flex items-center">
               <Gift className="w-6 h-6 mr-2" />
-              Special Combo Offers
+              Special Fashion Combo Offers
             </h2>
-            <p className="text-gray-600">Limited time deals - Save big on combo purchases!</p>
+            <p className="text-gray-600">Limited time deals - Mix & Match Fashion at Best Prices!</p>
           </div>
           <Button variant="ghost" onClick={onClose}>
             <X className="w-6 h-6" />
@@ -120,16 +134,16 @@ const ComboOffers = ({ onClose }: ComboOffersProps) => {
                   </Badge>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="grid grid-cols-1 gap-3 mb-4">
                   {combo.products.map((product) => (
-                    <div key={product.id} className="flex items-center space-x-2 bg-gray-50 p-2 rounded">
+                    <div key={product.id} className="flex items-center space-x-3 bg-gray-50 p-3 rounded">
                       <img 
                         src={product.image} 
                         alt={product.name}
-                        className="w-12 h-12 object-cover rounded"
+                        className="w-16 h-16 object-cover rounded"
                       />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{product.name}</p>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{product.name}</p>
                         <p className="text-xs text-gray-500">₹{product.price}</p>
                       </div>
                     </div>
@@ -170,10 +184,11 @@ const ComboOffers = ({ onClose }: ComboOffersProps) => {
           <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <h4 className="font-bold text-yellow-800 mb-2">🎉 Additional Benefits:</h4>
             <ul className="text-sm text-yellow-700 space-y-1">
-              <li>• Free shipping on all combo orders</li>
-              <li>• 30-day easy returns</li>
+              <li>• Free shipping on all combo orders above ₹999</li>
+              <li>• 30-day easy returns & exchanges</li>
               <li>• Gift wrapping available</li>
               <li>• Earn loyalty points on every purchase</li>
+              <li>• Mix & match different categories</li>
             </ul>
           </div>
         </div>

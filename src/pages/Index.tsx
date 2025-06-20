@@ -8,72 +8,79 @@ import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/hooks/useCart';
 import ComboOffers from '@/components/ComboOffers';
 
-// Indian Clothing Products (100+ items)
+// Indian Clothing Products with uploaded images
 const mockProducts = [
+  // Women's Dresses with uploaded images
+  { id: 1, name: "Green Floral Maxi Dress", price: 2299, originalPrice: 3499, image: "/lovable-uploads/96263624-bbc8-400e-8bef-222f59cba99a.png", category: "Women's Western", rating: 4.6, description: "Beautiful green floral print maxi dress", discount: 34 },
+  { id: 2, name: "Pink Floral Mini Dress", price: 1599, originalPrice: 2299, image: "/lovable-uploads/af1bcb88-3340-4c04-9e9e-beba1e570e8f.png", category: "Women's Western", rating: 4.5, description: "Cute pink floral mini dress with puff sleeves", discount: 30 },
+  { id: 3, name: "Peach Button-Up Dress", price: 1899, originalPrice: 2799, image: "/lovable-uploads/9b2796b4-4090-42a0-9d03-03bfc52bcdca.png", category: "Women's Western", rating: 4.4, description: "Elegant peach colored button-up dress", discount: 32 },
+  { id: 4, name: "Red Bodycon Dress", price: 2499, originalPrice: 3799, image: "/lovable-uploads/a8ceae1e-c31e-4874-9a53-b50afb591439.png", category: "Women's Western", rating: 4.7, description: "Stunning red bodycon midi dress", discount: 34 },
+  { id: 5, name: "Brown Collar Sweater", price: 1799, originalPrice: 2599, image: "/lovable-uploads/9797e669-1fd7-4b0b-a823-7ee3dd4846d0.png", category: "Women's Western", rating: 4.3, description: "Brown sweater with white collar", discount: 31 },
+  { id: 6, name: "Blue Floral Top", price: 999, originalPrice: 1499, image: "/lovable-uploads/68ee88a9-24f0-4523-a557-ff040eeb4760.png", category: "Women's Western", rating: 4.2, description: "Blue and white floral pattern top", discount: 33 },
+  { id: 7, name: "Checkered Vintage Blouse", price: 1299, originalPrice: 1899, image: "/lovable-uploads/6b06f730-d9cb-45c4-ab5d-c63ea3e7853d.png", category: "Women's Western", rating: 4.4, description: "Vintage checkered blouse", discount: 32 },
+  { id: 8, name: "Burgundy Vest Dress", price: 2199, originalPrice: 3299, image: "/lovable-uploads/cc9d8896-b9c9-4300-9029-fcd6f837dc76.png", category: "Women's Western", rating: 4.6, description: "Burgundy vest dress with white shirt", discount: 33 },
+  { id: 9, name: "Pink Ruffle Top", price: 1199, originalPrice: 1799, image: "/lovable-uploads/b162e3a0-19f8-49d4-b866-a1142d29881a.png", category: "Women's Western", rating: 4.3, description: "Pink ruffle sleeve top", discount: 33 },
+  { id: 10, name: "Traditional Lehenga", price: 5999, originalPrice: 8999, image: "/lovable-uploads/895d725f-a8e9-4e50-999d-703d9fc6523a.png", category: "Women's Ethnic", rating: 4.8, description: "Beautiful traditional lehenga", discount: 33 },
+
   // Men's Ethnic Wear
-  { id: 1, name: "Men's Cotton Kurta Set", price: 1299, originalPrice: 1999, image: "https://images.unsplash.com/photo-1622445275576-721325763eda?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.5, description: "Pure cotton kurta with matching pajama", discount: 35 },
-  { id: 2, name: "Silk Dhoti Kurta", price: 2499, originalPrice: 3999, image: "https://images.unsplash.com/photo-1594736797933-d0301ba9d3be?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.7, description: "Traditional silk dhoti kurta for festivals", discount: 38 },
-  { id: 3, name: "Nehru Jacket Set", price: 1899, originalPrice: 2899, image: "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.4, description: "Elegant Nehru jacket with kurta", discount: 34 },
-  { id: 4, name: "Bandhgala Suit", price: 4999, originalPrice: 7999, image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.8, description: "Royal bandhgala suit for weddings", discount: 38 },
-  { id: 5, name: "Pathani Suit", price: 1599, originalPrice: 2299, image: "https://images.unsplash.com/photo-1564564244660-5d73c057f2d2?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.3, description: "Comfortable pathani suit", discount: 30 },
-  
-  // Women's Ethnic Wear
-  { id: 6, name: "Banarasi Silk Saree", price: 3999, originalPrice: 6999, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=400&fit=crop", category: "Women's Ethnic", rating: 4.9, description: "Handwoven Banarasi silk saree", discount: 43 },
-  { id: 7, name: "Anarkali Suit Set", price: 2299, originalPrice: 3499, image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=400&fit=crop", category: "Women's Ethnic", rating: 4.6, description: "Beautiful Anarkali with dupatta", discount: 34 },
-  { id: 8, name: "Lehenga Choli", price: 5999, originalPrice: 9999, image: "https://images.unsplash.com/photo-1594736797933-d0301ba9d3be?w=400&h=400&fit=crop", category: "Women's Ethnic", rating: 4.8, description: "Designer lehenga for weddings", discount: 40 },
-  { id: 9, name: "Cotton Kurti", price: 799, originalPrice: 1299, image: "https://images.unsplash.com/photo-1594736797933-d0301ba9d3be?w=400&h=400&fit=crop", category: "Women's Ethnic", rating: 4.2, description: "Comfortable cotton kurti", discount: 38 },
-  { id: 10, name: "Palazzo Set", price: 1199, originalPrice: 1899, image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=400&fit=crop", category: "Women's Ethnic", rating: 4.4, description: "Trendy palazzo with kurta", discount: 37 },
+  { id: 11, name: "Cotton Kurta Set", price: 1299, originalPrice: 1999, image: "https://images.unsplash.com/photo-1622445275576-721325763eda?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.5, description: "Pure cotton kurta with matching pajama", discount: 35 },
+  { id: 12, name: "Silk Dhoti Kurta", price: 2499, originalPrice: 3999, image: "https://images.unsplash.com/photo-1594736797933-d0301ba9d3be?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.7, description: "Traditional silk dhoti kurta", discount: 38 },
+  { id: 13, name: "Nehru Jacket Set", price: 1899, originalPrice: 2899, image: "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.4, description: "Elegant Nehru jacket with kurta", discount: 34 },
+  { id: 14, name: "Bandhgala Suit", price: 4999, originalPrice: 7999, image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.8, description: "Royal bandhgala suit", discount: 38 },
+  { id: 15, name: "Pathani Suit", price: 1599, originalPrice: 2299, image: "https://images.unsplash.com/photo-1564564244660-5d73c057f2d2?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.3, description: "Comfortable pathani suit", discount: 30 },
+
+  // Women's Ethnic Sarees
+  { id: 16, name: "Banarasi Silk Saree", price: 3999, originalPrice: 6999, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=400&fit=crop", category: "Sarees", rating: 4.9, description: "Handwoven Banarasi silk saree", discount: 43 },
+  { id: 17, name: "Cotton Saree", price: 1299, originalPrice: 1999, image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=400&fit=crop", category: "Sarees", rating: 4.4, description: "Comfortable cotton saree", discount: 35 },
+  { id: 18, name: "Designer Georgette Saree", price: 2799, originalPrice: 4299, image: "https://images.unsplash.com/photo-1594736797933-d0301ba9d3be?w=400&h=400&fit=crop", category: "Sarees", rating: 4.6, description: "Designer georgette saree", discount: 35 },
+  { id: 19, name: "Wedding Silk Saree", price: 5499, originalPrice: 8999, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=400&fit=crop", category: "Sarees", rating: 4.8, description: "Elegant wedding silk saree", discount: 39 },
+  { id: 20, name: "Printed Chiffon Saree", price: 1899, originalPrice: 2899, image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=400&fit=crop", category: "Sarees", rating: 4.5, description: "Printed chiffon saree", discount: 34 },
+
+  // Women's Shoes
+  { id: 21, name: "Ethnic Juttis", price: 799, originalPrice: 1299, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop", category: "Women's Shoes", rating: 4.3, description: "Traditional ethnic juttis", discount: 38 },
+  { id: 22, name: "High Heel Sandals", price: 1599, originalPrice: 2299, image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&h=400&fit=crop", category: "Women's Shoes", rating: 4.4, description: "Elegant high heel sandals", discount: 30 },
+  { id: 23, name: "Casual Sneakers", price: 1299, originalPrice: 1899, image: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=400&h=400&fit=crop", category: "Women's Shoes", rating: 4.2, description: "Comfortable casual sneakers", discount: 32 },
+  { id: 24, name: "Kolhapuri Chappals", price: 599, originalPrice: 999, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop", category: "Women's Shoes", rating: 4.5, description: "Traditional Kolhapuri chappals", discount: 40 },
+  { id: 25, name: "Block Heel Pumps", price: 1899, originalPrice: 2799, image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&h=400&fit=crop", category: "Women's Shoes", rating: 4.6, description: "Stylish block heel pumps", discount: 32 },
+
+  // Men's Shoes
+  { id: 26, name: "Formal Leather Shoes", price: 2299, originalPrice: 3499, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop", category: "Men's Shoes", rating: 4.5, description: "Premium leather formal shoes", discount: 34 },
+  { id: 27, name: "Casual Loafers", price: 1599, originalPrice: 2299, image: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=400&h=400&fit=crop", category: "Men's Shoes", rating: 4.3, description: "Comfortable casual loafers", discount: 30 },
+  { id: 28, name: "Sports Sneakers", price: 1999, originalPrice: 2999, image: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=400&h=400&fit=crop", category: "Men's Shoes", rating: 4.4, description: "Athletic sports sneakers", discount: 33 },
+  { id: 29, name: "Ethnic Mojaris", price: 899, originalPrice: 1399, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop", category: "Men's Shoes", rating: 4.2, description: "Traditional mojaris", discount: 36 },
+  { id: 30, name: "Oxford Shoes", price: 2799, originalPrice: 3999, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop", category: "Men's Shoes", rating: 4.6, description: "Classic Oxford shoes", discount: 30 },
 
   // Men's Western Wear
-  { id: 11, name: "Cotton Casual Shirt", price: 899, originalPrice: 1499, image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.3, description: "100% cotton casual shirt", discount: 40 },
-  { id: 12, name: "Denim Jeans", price: 1599, originalPrice: 2499, image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.5, description: "Premium denim jeans", discount: 36 },
-  { id: 13, name: "Polo T-Shirt", price: 699, originalPrice: 999, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.2, description: "Cotton polo t-shirt", discount: 30 },
-  { id: 14, name: "Formal Blazer", price: 2999, originalPrice: 4999, image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.7, description: "Formal blazer for office", discount: 40 },
-  { id: 15, name: "Cargo Pants", price: 1299, originalPrice: 1999, image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.1, description: "Multi-pocket cargo pants", discount: 35 },
-
-  // Women's Western Wear
-  { id: 16, name: "Casual Top", price: 599, originalPrice: 999, image: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=400&fit=crop", category: "Women's Western", rating: 4.3, description: "Trendy casual top", discount: 40 },
-  { id: 17, name: "High Waist Jeans", price: 1399, originalPrice: 2199, image: "https://images.unsplash.com/photo-1582418702059-97ebafb35d09?w=400&h=400&fit=crop", category: "Women's Western", rating: 4.6, description: "High waist skinny jeans", discount: 36 },
-  { id: 18, name: "Maxi Dress", price: 1199, originalPrice: 1899, image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&h=400&fit=crop", category: "Women's Western", rating: 4.4, description: "Elegant maxi dress", discount: 37 },
-  { id: 19, name: "Crop Top", price: 499, originalPrice: 799, image: "https://images.unsplash.com/photo-1564342196976-0e4869ba7fd3?w=400&h=400&fit=crop", category: "Women's Western", rating: 4.2, description: "Stylish crop top", discount: 38 },
-  { id: 20, name: "Blazer Jacket", price: 2199, originalPrice: 3499, image: "https://images.unsplash.com/photo-1594736797933-d0301ba9d3be?w=400&h=400&fit=crop", category: "Women's Western", rating: 4.5, description: "Professional blazer", discount: 37 },
+  { id: 31, name: "Cotton Casual Shirt", price: 899, originalPrice: 1499, image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.3, description: "100% cotton casual shirt", discount: 40 },
+  { id: 32, name: "Denim Jeans", price: 1599, originalPrice: 2499, image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.5, description: "Premium denim jeans", discount: 36 },
+  { id: 33, name: "Polo T-Shirt", price: 699, originalPrice: 999, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.2, description: "Cotton polo t-shirt", discount: 30 },
+  { id: 34, name: "Formal Blazer", price: 2999, originalPrice: 4999, image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.7, description: "Formal blazer for office", discount: 40 },
+  { id: 35, name: "Cargo Pants", price: 1299, originalPrice: 1999, image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.1, description: "Multi-pocket cargo pants", discount: 35 },
 
   // Kids Wear
-  { id: 21, name: "Boys Kurta Pajama", price: 799, originalPrice: 1299, image: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=400&h=400&fit=crop", category: "Kids", rating: 4.4, description: "Cotton kurta pajama for boys", discount: 38 },
-  { id: 22, name: "Girls Lehenga", price: 1299, originalPrice: 1999, image: "https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=400&h=400&fit=crop", category: "Kids", rating: 4.6, description: "Beautiful lehenga for girls", discount: 35 },
-  { id: 23, name: "Kids T-Shirt", price: 399, originalPrice: 699, image: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=400&h=400&fit=crop", category: "Kids", rating: 4.2, description: "Comfortable cotton t-shirt", discount: 43 },
-  { id: 24, name: "Boys Shorts", price: 499, originalPrice: 799, image: "https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=400&h=400&fit=crop", category: "Kids", rating: 4.1, description: "Cotton shorts for boys", discount: 38 },
-  { id: 25, name: "Girls Dress", price: 699, originalPrice: 1199, image: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=400&h=400&fit=crop", category: "Kids", rating: 4.5, description: "Pretty dress for girls", discount: 42 },
+  { id: 36, name: "Boys Kurta Pajama", price: 799, originalPrice: 1299, image: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=400&h=400&fit=crop", category: "Kids", rating: 4.4, description: "Cotton kurta pajama for boys", discount: 38 },
+  { id: 37, name: "Girls Lehenga", price: 1299, originalPrice: 1999, image: "https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=400&h=400&fit=crop", category: "Kids", rating: 4.6, description: "Beautiful lehenga for girls", discount: 35 },
+  { id: 38, name: "Kids T-Shirt", price: 399, originalPrice: 699, image: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=400&h=400&fit=crop", category: "Kids", rating: 4.2, description: "Comfortable cotton t-shirt", discount: 43 },
+  { id: 39, name: "Boys Shorts", price: 499, originalPrice: 799, image: "https://images.unsplash.com/photo-1515488764276-beab7607c1e6?w=400&h=400&fit=crop", category: "Kids", rating: 4.1, description: "Cotton shorts for boys", discount: 38 },
+  { id: 40, name: "Girls Dress", price: 699, originalPrice: 1199, image: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=400&h=400&fit=crop", category: "Kids", rating: 4.5, description: "Pretty dress for girls", discount: 42 },
 
-  // Accessories
-  { id: 26, name: "Silk Dupatta", price: 599, originalPrice: 999, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=400&fit=crop", category: "Accessories", rating: 4.3, description: "Elegant silk dupatta", discount: 40 },
-  { id: 27, name: "Leather Belt", price: 799, originalPrice: 1299, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop", category: "Accessories", rating: 4.4, description: "Genuine leather belt", discount: 38 },
-  { id: 28, name: "Cotton Stole", price: 399, originalPrice: 699, image: "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=400&h=400&fit=crop", category: "Accessories", rating: 4.2, description: "Soft cotton stole", discount: 43 },
-  { id: 29, name: "Ethnic Jewelry Set", price: 1299, originalPrice: 2199, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=400&fit=crop", category: "Accessories", rating: 4.7, description: "Traditional jewelry set", discount: 41 },
-  { id: 30, name: "Handbag", price: 999, originalPrice: 1699, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop", category: "Accessories", rating: 4.3, description: "Stylish handbag", discount: 41 },
-
-  // Additional Products to reach 100+
-  { id: 31, name: "Cotton Pyjama Set", price: 899, originalPrice: 1399, image: "https://images.unsplash.com/photo-1622445275576-721325763eda?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.3, description: "Comfortable cotton pyjama", discount: 36 },
-  { id: 32, name: "Designer Kurta", price: 1599, originalPrice: 2499, image: "https://images.unsplash.com/photo-1594736797933-d0301ba9d3be?w=400&h=400&fit=crop", category: "Men's Ethnic", rating: 4.6, description: "Designer printed kurta", discount: 36 },
-  { id: 33, name: "Formal Shirt", price: 1099, originalPrice: 1799, image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.4, description: "Formal office shirt", discount: 39 },
-  { id: 34, name: "Chinos", price: 1399, originalPrice: 2199, image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=400&fit=crop", category: "Men's Western", rating: 4.5, description: "Slim fit chinos", discount: 36 },
-  { id: 35, name: "Printed Saree", price: 1999, originalPrice: 3199, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=400&fit=crop", category: "Women's Ethnic", rating: 4.5, description: "Beautiful printed saree", discount: 38 },
-
-  // Continue adding more products...
-  ...Array.from({ length: 65 }, (_, i) => ({
-    id: 36 + i,
-    name: `Fashion Item ${36 + i}`,
-    price: Math.floor(Math.random() * 3000) + 500,
-    originalPrice: Math.floor(Math.random() * 2000) + 1000,
-    image: `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 100000000)}?w=400&h=400&fit=crop`,
-    category: ["Men's Ethnic", "Women's Ethnic", "Men's Western", "Women's Western", "Kids", "Accessories"][Math.floor(Math.random() * 6)],
-    rating: 4 + Math.random(),
-    description: "Premium quality clothing item",
-    discount: Math.floor(Math.random() * 30) + 20
-  })).map(item => ({
-    ...item,
-    originalPrice: Math.floor(item.price * 1.5)
-  }))
+  // Additional products to reach 100+
+  ...Array.from({ length: 60 }, (_, i) => {
+    const categories = ["Men's Ethnic", "Women's Ethnic", "Men's Western", "Women's Western", "Kids", "Sarees", "Men's Shoes", "Women's Shoes"];
+    const category = categories[i % categories.length];
+    const basePrice = Math.floor(Math.random() * 3000) + 500;
+    return {
+      id: 41 + i,
+      name: `${category} Item ${41 + i}`,
+      price: basePrice,
+      originalPrice: Math.floor(basePrice * 1.5),
+      image: `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 100000000)}?w=400&h=400&fit=crop`,
+      category: category,
+      rating: 4 + Math.random(),
+      description: "Premium quality fashion item",
+      discount: Math.floor(Math.random() * 30) + 20
+    };
+  })
 ];
 
 const Index = () => {
@@ -83,7 +90,7 @@ const Index = () => {
   const [showComboOffers, setShowComboOffers] = useState(true);
   const { addToCart, getCartItemsCount } = useCart();
 
-  const categories = ['All', "Men's Ethnic", "Women's Ethnic", "Men's Western", "Women's Western", 'Kids', 'Accessories'];
+  const categories = ['All', "Men's Ethnic", "Women's Ethnic", "Men's Western", "Women's Western", 'Kids', 'Sarees', "Men's Shoes", "Women's Shoes"];
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -169,12 +176,13 @@ const Index = () => {
       {/* Big Sales Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-4">BIG SALES</h2>
-          <div className="flex justify-center space-x-4 mb-6">
-            <Badge variant="outline" className="text-lg px-4 py-2">Women</Badge>
-            <Badge variant="outline" className="text-lg px-4 py-2">Men</Badge>
-            <Badge variant="outline" className="text-lg px-4 py-2">Kids</Badge>
-            <Badge variant="outline" className="text-lg px-4 py-2">Accessories</Badge>
+          <h2 className="text-3xl font-bold mb-4">BIG SALES - 100+ Products</h2>
+          <div className="flex justify-center space-x-4 mb-6 flex-wrap">
+            <Badge variant="outline" className="text-lg px-4 py-2 mb-2">Women</Badge>
+            <Badge variant="outline" className="text-lg px-4 py-2 mb-2">Men</Badge>
+            <Badge variant="outline" className="text-lg px-4 py-2 mb-2">Kids</Badge>
+            <Badge variant="outline" className="text-lg px-4 py-2 mb-2">Sarees</Badge>
+            <Badge variant="outline" className="text-lg px-4 py-2 mb-2">Shoes</Badge>
           </div>
         </div>
 
