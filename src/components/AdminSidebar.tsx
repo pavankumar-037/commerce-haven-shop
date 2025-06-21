@@ -1,83 +1,79 @@
 
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Package, 
   ShoppingCart, 
+  Gift,
   Settings,
-  Menu,
-  X,
-  Store
+  Tag,
+  Users
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const AdminSidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
 
   const menuItems = [
     {
-      title: "Dashboard",
       icon: LayoutDashboard,
-      path: "/admin/dashboard"
+      label: 'Dashboard',
+      path: '/admin/dashboard'
     },
     {
-      title: "Products",
       icon: Package,
-      path: "/admin/products"
+      label: 'Products',
+      path: '/admin/products'
     },
     {
-      title: "Orders",
       icon: ShoppingCart,
-      path: "/admin/orders"
+      label: 'Orders',
+      path: '/admin/orders'
     },
     {
-      title: "Settings",
+      icon: Gift,
+      label: 'Combo Offers',
+      path: '/admin/offers'
+    },
+    {
+      icon: Tag,
+      label: 'Coupons',
+      path: '/admin/coupons'
+    },
+    {
+      icon: Users,
+      label: 'Customers',
+      path: '/admin/customers'
+    },
+    {
       icon: Settings,
-      path: "/admin/settings"
+      label: 'Settings',
+      path: '/admin/settings'
     }
   ];
 
   return (
-    <div className={`bg-white shadow-lg transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
-      <div className="p-4 border-b">
-        <div className="flex items-center justify-between">
-          {!isCollapsed && (
-            <div className="flex items-center space-x-2">
-              <Store className="w-8 h-8 text-primary" />
-              <span className="text-xl font-bold">Admin Panel</span>
-            </div>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2"
-          >
-            {isCollapsed ? <Menu className="w-4 h-4" /> : <X className="w-4 h-4" />}
-          </Button>
-        </div>
+    <div className="w-64 bg-gray-900 text-white min-h-screen">
+      <div className="p-6">
+        <h2 className="text-xl font-bold">Admin Panel</h2>
       </div>
-
-      <nav className="p-4">
-        <ul className="space-y-2">
-          {menuItems.map((item) => (
-            <li key={item.path}>
-              <Link
-                to={item.path}
-                className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
-                  location.pathname === item.path
-                    ? 'bg-primary text-white'
-                    : 'hover:bg-gray-100 text-gray-700'
-                }`}
-              >
-                <item.icon className="w-5 h-5" />
-                {!isCollapsed && <span>{item.title}</span>}
-              </Link>
-            </li>
-          ))}
-        </ul>
+      <nav className="mt-6">
+        {menuItems.map((item, index) => {
+          const Icon = item.icon;
+          const isActive = location.pathname === item.path;
+          
+          return (
+            <Link
+              key={index}
+              to={item.path}
+              className={`flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors ${
+                isActive ? 'bg-gray-800 text-white border-r-4 border-blue-500' : ''
+              }`}
+            >
+              <Icon className="w-5 h-5 mr-3" />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );
