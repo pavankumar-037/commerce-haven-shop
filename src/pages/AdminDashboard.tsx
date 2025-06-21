@@ -9,14 +9,24 @@ import {
   TrendingUp, 
   Eye,
   LogOut,
-  BarChart3
+  BarChart3,
+  User,
+  Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import AdminSidebar from '@/components/AdminSidebar';
+
+interface AdminUser {
+  username: string;
+  role: string;
+  loginTime: string;
+}
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalOrders: 0,
@@ -32,9 +42,15 @@ const AdminDashboard = () => {
       return;
     }
 
+    // Get admin user info
+    const storedUser = localStorage.getItem('adminUser');
+    if (storedUser) {
+      setAdminUser(JSON.parse(storedUser));
+    }
+
     // Load dashboard stats
     const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    const products = JSON.parse(localStorage.getItem('products') || '[]');
+    const products = JSON.parse(localStorage.getItem('adminProducts') || '[]');
     
     const totalRevenue = orders.reduce((sum: number, order: any) => sum + order.total, 0);
     const pendingOrders = orders.filter((order: any) => order.status === 'pending').length;
@@ -49,7 +65,17 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('adminAuth');
+    localStorage.removeItem('adminUser');
     navigate('/admin/login');
+  };
+
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'Super Admin': return 'bg-red-500';
+      case 'Manager': return 'bg-blue-500';
+      case 'Staff': return 'bg-green-500';
+      default: return 'bg-gray-500';
+    }
   };
 
   const statCards = [
@@ -91,12 +117,35 @@ const AdminDashboard = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p className="text-gray-600">Welcome back, manage your store efficiently</p>
+            <p className="text-gray-600">Manage your CommerceHaven store efficiently</p>
           </div>
-          <Button onClick={handleLogout} variant="outline">
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Button>
+          <div className="flex items-center space-x-4">
+            {adminUser && (
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <User className="w-8 h-8 text-gray-500" />
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <span className="font-semibold">{adminUser.username}</span>
+                        <Badge className={`${getRoleBadgeColor(adminUser.role)} text-white text-xs`}>
+                          {adminUser.role}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center text-xs text-gray-500 mt-1">
+                        <Clock className="w-3 h-3 mr-1" />
+                        Logged in: {new Date(adminUser.loginTime).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            <Button onClick={handleLogout} variant="outline" className="flex items-center">
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -159,24 +208,33 @@ const AdminDashboard = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle>Admin Access Levels</CardTitle>
               <CardDescription>
-                Latest store activities
+                Available roles and permissions
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm">Admin panel accessed</span>
+                <div className="flex items-center justify-between p-3 border rounded">
+                  <div>
+                    <span className="font-semibold text-red-600">Super Admin</span>
+                    <p className="text-sm text-gray-500">Full system access</p>
+                  </div>
+                  <Badge className="bg-red-500 text-white">All Permissions</Badge>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm">Dashboard loaded successfully</span>
+                <div className="flex items-center justify-between p-3 border rounded">
+                  <div>
+                    <span className="font-semibold text-blue-600">Manager</span>
+                    <p className="text-sm text-gray-500">Products & Orders</p>
+                  </div>
+                  <Badge className="bg-blue-500 text-white">Limited Access</Badge>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span className="text-sm">System running smoothly</span>
+                <div className="flex items-center justify-between p-3 border rounded">
+                  <div>
+                    <span className="font-semibold text-green-600">Staff</span>
+                    <p className="text-sm text-gray-500">View only access</p>
+                  </div>
+                  <Badge className="bg-green-500 text-white">Read Only</Badge>
                 </div>
               </div>
             </CardContent>
