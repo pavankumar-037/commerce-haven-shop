@@ -21,7 +21,7 @@ const Auth = () => {
     confirmPassword: ''
   });
 
-  const handleLogin = (e) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // Simulate login
     localStorage.setItem('user', JSON.stringify({ 
@@ -32,7 +32,7 @@ const Auth = () => {
     navigate('/');
   };
 
-  const handleSignup = (e) => {
+  const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     if (signupData.password !== signupData.confirmPassword) {
       alert('Passwords do not match!');
