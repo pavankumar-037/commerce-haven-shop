@@ -7,7 +7,8 @@ import {
   Gift,
   Settings,
   Tag,
-  Users
+  Grid3X3,
+  Mail
 } from 'lucide-react';
 
 const AdminSidebar = () => {
@@ -25,6 +26,11 @@ const AdminSidebar = () => {
       path: '/admin/products'
     },
     {
+      icon: Grid3X3,
+      label: 'Sections',
+      path: '/admin/sections'
+    },
+    {
       icon: ShoppingCart,
       label: 'Orders',
       path: '/admin/orders'
@@ -38,6 +44,11 @@ const AdminSidebar = () => {
       icon: Tag,
       label: 'Coupons',
       path: '/admin/coupons'
+    },
+    {
+      icon: Mail,
+      label: 'Messages',
+      path: '/admin/messages'
     },
     {
       icon: Settings,

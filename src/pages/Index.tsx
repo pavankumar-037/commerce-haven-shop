@@ -110,6 +110,12 @@ const Index = () => {
                 <Gift className="w-5 h-5 mr-2" />
                 Offers
               </Button>
+              <Link to="/track-order" className="text-gray-600 hover:text-primary text-sm">
+                Track Order
+              </Link>
+              <Link to="/contact" className="text-gray-600 hover:text-primary text-sm">
+                Contact
+              </Link>
               <Link to="/auth" className="text-gray-600 hover:text-primary">
                 <User className="w-6 h-6" />
               </Link>
@@ -239,9 +245,9 @@ const Index = () => {
           <h3 className="text-2xl font-bold mb-4">IndiaFashion</h3>
           <p className="text-gray-300 mb-6">Your trusted partner for authentic Indian fashion</p>
           <div className="flex justify-center space-x-6 mb-4">
-            <span>Free Shipping</span>
+            <Link to="/track-order" className="text-gray-300 hover:text-white">Track Order</Link>
             <span>•</span>
-            <span>Easy Returns</span>
+            <Link to="/contact" className="text-gray-300 hover:text-white">Contact Us</Link>
             <span>•</span>
             <span>24/7 Support</span>
           </div>
