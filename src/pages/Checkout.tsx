@@ -1,19 +1,23 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Smartphone, Banknote, Tag, X } from 'lucide-react';
+
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, CreditCard, Truck, MapPin, User, Phone, Mail, Tag, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useCart } from '@/hooks/useCart';
 import { useCoupons } from '@/hooks/useCoupons';
 import { toast } from '@/hooks/use-toast';
 
 const Checkout = () => {
+  const navigate = useNavigate();
   const { cartItems, getCartTotal, clearCart } = useCart();
   const { appliedCoupon, applyCoupon, removeCoupon, useCoupon } = useCoupons();
-  const navigate = useNavigate();
   
+  const [couponCode, setCouponCode] = useState('');
+  const [couponError, setCouponError] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -21,26 +25,28 @@ const Checkout = () => {
     address: '',
     city: '',
     state: '',
-    pincode: '',
+    zipCode: '',
     phone: '',
     paymentMethod: 'cod'
   });
 
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [couponCode, setCouponCode] = useState('');
-  const [couponError, setCouponError] = useState('');
+  const subtotal = getCartTotal();
+  const couponDiscount = appliedCoupon ? applyCoupon(appliedCoupon.code, subtotal).discount : 0;
+  const shippingCost = (subtotal - couponDiscount) > 999 ? 0 : 50;
+  const total = subtotal - couponDiscount + shippingCost;
 
-  const handleInputChange = (e) => {
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      navigate('/cart');
+    }
+  }, [cartItems, navigate]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
-
-  const subtotal = getCartTotal();
-  const couponDiscount = appliedCoupon ? applyCoupon(appliedCoupon.code, subtotal).discount : 0;
-  const shippingCost = (subtotal - couponDiscount) > 999 ? 0 : 50;
-  const totalAmount = subtotal - couponDiscount + shippingCost;
 
   const handleApplyCoupon = () => {
     if (!couponCode.trim()) {
@@ -63,321 +69,342 @@ const Checkout = () => {
     toast({ title: "Coupon removed" });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsProcessing(true);
+    
+    // Basic validation
+    if (!formData.email || !formData.firstName || !formData.lastName || 
+        !formData.address || !formData.city || !formData.state || 
+        !formData.zipCode || !formData.phone) {
+      toast({
+        title: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    // Mark coupon as used if applied
+    // Create order
+    const order = {
+      id: Date.now().toString(),
+      items: cartItems,
+      customerInfo: formData,
+      subtotal: Number(subtotal.toFixed(2)),
+      couponDiscount: Number(couponDiscount.toFixed(2)),
+      shippingCost: Number(shippingCost.toFixed(2)),
+      total: Number(total.toFixed(2)),
+      appliedCoupon: appliedCoupon,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      paymentMethod: formData.paymentMethod
+    };
+
+    // Save order to localStorage
+    const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+    localStorage.setItem('orders', JSON.stringify([...existingOrders, order]));
+
+    // Use coupon if applied
     if (appliedCoupon) {
       useCoupon(appliedCoupon.id);
     }
 
-    // Simulate different payment processing times
-    const processingTime = formData.paymentMethod === 'cod' ? 1000 : 2500;
+    // Clear cart
+    clearCart();
 
-    setTimeout(() => {
-      clearCart();
-      setIsProcessing(false);
-      navigate('/order-success', { 
-        state: { 
-          orderTotal: totalAmount,
-          paymentMethod: formData.paymentMethod,
-          appliedCoupon: appliedCoupon ? {
-            code: appliedCoupon.code,
-            discount: couponDiscount
-          } : null
-        }
-      });
-    }, processingTime);
+    toast({
+      title: "Order placed successfully!",
+      description: "You will receive a confirmation email shortly."
+    });
+
+    // Navigate to success page
+    navigate('/order-success', { state: { order } });
   };
-
-  if (cartItems.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">No items to checkout</h2>
-          <Link to="/">
-            <Button className="bg-orange-500 hover:bg-orange-600">Continue Shopping</Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/cart" className="inline-flex items-center text-primary hover:text-primary/80 mb-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <button
+          onClick={() => navigate('/cart')}
+          className="inline-flex items-center text-primary hover:text-primary/80 mb-6"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Cart
-        </Link>
+        </button>
 
         <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Checkout Form */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-semibold mb-6">Shipping Information</h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Mail className="w-5 h-5 mr-2" />
+                  Contact Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="email">Email *</Label>
                   <Input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    value={formData.firstName}
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
                     onChange={handleInputChange}
+                    placeholder="Enter your email"
                     required
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <MapPin className="w-5 h-5 mr-2" />
+                  Shipping Address
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName">First Name *</Label>
+                    <Input
+                      type="text"
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      placeholder="First name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      placeholder="Last name"
+                      required
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="address">Address *</Label>
                   <Input
                     type="text"
-                    id="lastName"
-                    name="lastName"
-                    value={formData.lastName}
+                    id="address"
+                    name="address"
+                    value={formData.address}
                     onChange={handleInputChange}
+                    placeholder="Street address"
                     required
                   />
                 </div>
-              </div>
 
-              <div>
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  placeholder="+91 XXXXX XXXXX"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="address">Full Address</Label>
-                <Input
-                  type="text"
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="city">City</Label>
-                  <Input
-                    type="text"
-                    id="city"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    required
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="city">City *</Label>
+                    <Input
+                      type="text"
+                      id="city"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                      placeholder="City"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">State *</Label>
+                    <Input
+                      type="text"
+                      id="state"
+                      name="state"
+                      value={formData.state}
+                      onChange={handleInputChange}
+                      placeholder="State"
+                      required
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="state">State</Label>
-                  <Input
-                    type="text"
-                    id="state"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    required
-                  />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="zipCode">ZIP Code *</Label>
+                    <Input
+                      type="text"
+                      id="zipCode"
+                      name="zipCode"
+                      value={formData.zipCode}
+                      onChange={handleInputChange}
+                      placeholder="ZIP code"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Phone *</Label>
+                    <Input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder="Phone number"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div>
-                <Label htmlFor="pincode">PIN Code</Label>
-                <Input
-                  type="text"
-                  id="pincode"
-                  name="pincode"
-                  placeholder="123456"
-                  value={formData.pincode}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="pt-6">
-                <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
-                <RadioGroup 
-                  value={formData.paymentMethod} 
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <CreditCard className="w-5 h-5 mr-2" />
+                  Payment Method
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <RadioGroup
+                  value={formData.paymentMethod}
                   onValueChange={(value) => setFormData({...formData, paymentMethod: value})}
                 >
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg">
+                  <div className="flex items-center space-x-2">
                     <RadioGroupItem value="cod" id="cod" />
                     <Label htmlFor="cod" className="flex items-center cursor-pointer">
-                      <Banknote className="w-5 h-5 mr-2" />
+                      <Truck className="w-4 h-4 mr-2" />
                       Cash on Delivery (COD)
                     </Label>
                   </div>
-                  
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                    <RadioGroupItem value="upi" id="upi" />
-                    <Label htmlFor="upi" className="flex items-center cursor-pointer">
-                      <Smartphone className="w-5 h-5 mr-2" />
-                      UPI Payment (PhonePe, GooglePay, Paytm)
-                    </Label>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg">
+                  <div className="flex items-center space-x-2">
                     <RadioGroupItem value="card" id="card" />
                     <Label htmlFor="card" className="flex items-center cursor-pointer">
-                      <CreditCard className="w-5 h-5 mr-2" />
+                      <CreditCard className="w-4 h-4 mr-2" />
                       Credit/Debit Card
                     </Label>
                   </div>
-                  
-                  <div className="flex items-center space-x-2 p-4 border rounded-lg">
-                    <RadioGroupItem value="paypal" id="paypal" />
-                    <Label htmlFor="paypal" className="flex items-center cursor-pointer">
-                      <CreditCard className="w-5 h-5 mr-2" />
-                      PayPal International
-                    </Label>
-                  </div>
                 </RadioGroup>
-              </div>
-
-              <Button 
-                type="submit" 
-                size="lg" 
-                className="w-full mt-6 bg-orange-500 hover:bg-orange-600"
-                disabled={isProcessing}
-              >
-                {isProcessing ? 'Processing...' : `Place Order - ₹${totalAmount.toFixed(2)}`}
-              </Button>
-            </form>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Order Summary */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
-            
-            <div className="space-y-4 mb-6">
-              {cartItems.map(item => (
-                <div key={item.id} className="flex items-center justify-between">
-                  <div className="flex items-center">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {cartItems.map(item => (
+                  <div key={item.id} className="flex items-center space-x-4">
                     <img 
                       src={item.image} 
                       alt={item.name}
-                      className="w-12 h-12 object-cover rounded mr-3"
+                      className="w-16 h-16 object-cover rounded-md"
                     />
-                    <div>
-                      <p className="font-medium">{item.name}</p>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-sm">{item.name}</h4>
                       <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                     </div>
+                    <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
                   </div>
-                  <p className="font-semibold">
-                    ₹{(item.price * item.quantity).toFixed(2)}
-                  </p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </CardContent>
+            </Card>
 
             {/* Coupon Section */}
-            {!appliedCoupon ? (
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-semibold mb-3 flex items-center">
-                  <Tag className="w-4 h-4 mr-2" />
-                  Apply Coupon
-                </h3>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Enter coupon code"
-                    value={couponCode}
-                    onChange={(e) => {
-                      setCouponCode(e.target.value.toUpperCase());
-                      setCouponError('');
-                    }}
-                    className={couponError ? 'border-red-500' : ''}
-                    size="sm"
-                  />
-                  <Button 
-                    onClick={handleApplyCoupon}
-                    variant="outline"
-                    size="sm"
-                  >
-                    Apply
-                  </Button>
-                </div>
-                {couponError && (
-                  <p className="text-red-500 text-sm mt-1">{couponError}</p>
-                )}
-              </div>
-            ) : (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-green-800">
-                      Coupon "{appliedCoupon.code}" Applied!
-                    </p>
-                    <p className="text-sm text-green-600">{appliedCoupon.description}</p>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Tag className="w-5 h-5 mr-2" />
+                  Coupon Code
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {!appliedCoupon ? (
+                  <div className="space-y-3">
+                    <div className="flex gap-3">
+                      <Input
+                        placeholder="Enter coupon code"
+                        value={couponCode}
+                        onChange={(e) => {
+                          setCouponCode(e.target.value.toUpperCase());
+                          setCouponError('');
+                        }}
+                        className={couponError ? 'border-red-500' : ''}
+                      />
+                      <Button 
+                        onClick={handleApplyCoupon}
+                        variant="outline"
+                        className="bg-green-50 hover:bg-green-100 border-green-300"
+                      >
+                        Apply
+                      </Button>
+                    </div>
+                    {couponError && (
+                      <p className="text-red-500 text-sm">{couponError}</p>
+                    )}
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleRemoveCoupon}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
+                ) : (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-green-800">
+                        Coupon "{appliedCoupon.code}" Applied!
+                      </p>
+                      <p className="text-sm text-green-600">{appliedCoupon.description}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRemoveCoupon}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-            <div className="border-t pt-4 space-y-2">
-              <div className="flex justify-between items-center">
-                <span>Subtotal:</span>
-                <span>₹{subtotal.toFixed(2)}</span>
-              </div>
-              {appliedCoupon && (
-                <div className="flex justify-between items-center text-green-600">
-                  <span>Coupon Discount:</span>
-                  <span>-₹{couponDiscount.toFixed(2)}</span>
+            <Card>
+              <CardContent className="p-6">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Subtotal:</span>
+                    <span>₹{subtotal.toFixed(2)}</span>
+                  </div>
+                  {appliedCoupon && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Coupon Discount:</span>
+                      <span>-₹{couponDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span>Shipping:</span>
+                    <span className={shippingCost === 0 ? 'text-green-600' : ''}>
+                      {shippingCost === 0 ? 'FREE' : `₹${shippingCost}`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xl font-bold border-t pt-3">
+                    <span>Total:</span>
+                    <span className="text-orange-600">₹{total.toFixed(2)}</span>
+                  </div>
                 </div>
-              )}
-              <div className="flex justify-between items-center">
-                <span>Shipping:</span>
-                <span className={shippingCost === 0 ? 'text-green-600' : ''}>
-                  {shippingCost === 0 ? 'FREE' : `₹${shippingCost}`}
-                </span>
-              </div>
-              <div className="flex justify-between items-center text-lg font-bold border-t pt-2">
-                <span>Total:</span>
-                <span className="text-orange-600">₹{totalAmount.toFixed(2)}</span>
-              </div>
-            </div>
 
-            <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
-              <h4 className="font-semibold text-green-800 mb-2">🛡️ Secure Checkout</h4>
-              <ul className="text-sm text-green-700 space-y-1">
-                <li>• SSL encrypted payment</li>
-                <li>• 30-day return policy</li>
-                <li>• Customer support: 1800-XXX-XXXX</li>
-              </ul>
-            </div>
+                <Button 
+                  onClick={handleSubmit}
+                  size="lg" 
+                  className="w-full mt-6 bg-orange-500 hover:bg-orange-600"
+                >
+                  Place Order
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

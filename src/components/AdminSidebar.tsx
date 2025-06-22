@@ -40,11 +40,6 @@ const AdminSidebar = () => {
       path: '/admin/coupons'
     },
     {
-      icon: Users,
-      label: 'Customers',
-      path: '/admin/customers'
-    },
-    {
       icon: Settings,
       label: 'Settings',
       path: '/admin/settings'
