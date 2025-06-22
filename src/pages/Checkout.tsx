@@ -1,15 +1,17 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Smartphone, Banknote } from 'lucide-react';
+import { ArrowLeft, CreditCard, Smartphone, Banknote, Tag, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useCart } from '@/hooks/useCart';
+import { useCoupons } from '@/hooks/useCoupons';
+import { toast } from '@/hooks/use-toast';
 
 const Checkout = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
+  const { appliedCoupon, applyCoupon, removeCoupon, useCoupon } = useCoupons();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -25,6 +27,8 @@ const Checkout = () => {
   });
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponError, setCouponError] = useState('');
 
   const handleInputChange = (e) => {
     setFormData({
@@ -33,12 +37,40 @@ const Checkout = () => {
     });
   };
 
-  const shippingCost = getCartTotal() > 999 ? 0 : 50;
-  const totalAmount = getCartTotal() + shippingCost;
+  const subtotal = getCartTotal();
+  const couponDiscount = appliedCoupon ? applyCoupon(appliedCoupon.code, subtotal).discount : 0;
+  const shippingCost = (subtotal - couponDiscount) > 999 ? 0 : 50;
+  const totalAmount = subtotal - couponDiscount + shippingCost;
+
+  const handleApplyCoupon = () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    const result = applyCoupon(couponCode.trim(), subtotal);
+    if (result.isValid) {
+      toast({ title: result.message });
+      setCouponCode('');
+      setCouponError('');
+    } else {
+      setCouponError(result.message);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    removeCoupon();
+    toast({ title: "Coupon removed" });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
+
+    // Mark coupon as used if applied
+    if (appliedCoupon) {
+      useCoupon(appliedCoupon.id);
+    }
 
     // Simulate different payment processing times
     const processingTime = formData.paymentMethod === 'cod' ? 1000 : 2500;
@@ -49,7 +81,11 @@ const Checkout = () => {
       navigate('/order-success', { 
         state: { 
           orderTotal: totalAmount,
-          paymentMethod: formData.paymentMethod 
+          paymentMethod: formData.paymentMethod,
+          appliedCoupon: appliedCoupon ? {
+            code: appliedCoupon.code,
+            discount: couponDiscount
+          } : null
         }
       });
     }, processingTime);
@@ -260,11 +296,68 @@ const Checkout = () => {
               ))}
             </div>
 
+            {/* Coupon Section */}
+            {!appliedCoupon ? (
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="font-semibold mb-3 flex items-center">
+                  <Tag className="w-4 h-4 mr-2" />
+                  Apply Coupon
+                </h3>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter coupon code"
+                    value={couponCode}
+                    onChange={(e) => {
+                      setCouponCode(e.target.value.toUpperCase());
+                      setCouponError('');
+                    }}
+                    className={couponError ? 'border-red-500' : ''}
+                    size="sm"
+                  />
+                  <Button 
+                    onClick={handleApplyCoupon}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Apply
+                  </Button>
+                </div>
+                {couponError && (
+                  <p className="text-red-500 text-sm mt-1">{couponError}</p>
+                )}
+              </div>
+            ) : (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-green-800">
+                      Coupon "{appliedCoupon.code}" Applied!
+                    </p>
+                    <p className="text-sm text-green-600">{appliedCoupon.description}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRemoveCoupon}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <div className="border-t pt-4 space-y-2">
               <div className="flex justify-between items-center">
                 <span>Subtotal:</span>
-                <span>₹{getCartTotal().toFixed(2)}</span>
+                <span>₹{subtotal.toFixed(2)}</span>
               </div>
+              {appliedCoupon && (
+                <div className="flex justify-between items-center text-green-600">
+                  <span>Coupon Discount:</span>
+                  <span>-₹{couponDiscount.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between items-center">
                 <span>Shipping:</span>
                 <span className={shippingCost === 0 ? 'text-green-600' : ''}>
