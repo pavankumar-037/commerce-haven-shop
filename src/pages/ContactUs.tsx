@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail, Phone, MapPin, Send } from 'lucide-react';
+import { ArrowLeft, Mail, MapPin, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,7 +14,6 @@ const ContactUs = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
     subject: '',
     message: ''
   });
@@ -41,7 +40,6 @@ const ContactUs = () => {
 
     setIsSubmitting(true);
 
-    // Save message to localStorage for admin to view
     const contactMessage = {
       id: Date.now().toString(),
       ...formData,
@@ -52,7 +50,6 @@ const ContactUs = () => {
     const existingMessages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
     localStorage.setItem('contactMessages', JSON.stringify([contactMessage, ...existingMessages]));
 
-    // Simulate email sending (in real app, this would be handled by backend)
     setTimeout(() => {
       setIsSubmitting(false);
       toast({
@@ -60,11 +57,9 @@ const ContactUs = () => {
         description: "Thank you for contacting us. We'll get back to you soon.",
       });
       
-      // Reset form
       setFormData({
         name: '',
         email: '',
-        phone: '',
         subject: '',
         message: ''
       });
@@ -82,7 +77,6 @@ const ContactUs = () => {
         <h1 className="text-3xl font-bold mb-8">Contact Us</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Contact Form */}
           <Card>
             <CardHeader>
               <CardTitle>Send us a Message</CardTitle>
@@ -109,17 +103,6 @@ const ContactUs = () => {
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder="Enter your email address"
                     required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="Enter your phone number"
                   />
                 </div>
 
@@ -163,7 +146,6 @@ const ContactUs = () => {
             </CardContent>
           </Card>
 
-          {/* Contact Information */}
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -175,14 +157,6 @@ const ContactUs = () => {
                   <div>
                     <h4 className="font-semibold">Email</h4>
                     <p className="text-gray-600">cuteliitleprincess150@gmail.com</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <Phone className="w-5 h-5 text-primary mt-1" />
-                  <div>
-                    <h4 className="font-semibold">Phone</h4>
-                    <p className="text-gray-600">+91 98765 43210</p>
                   </div>
                 </div>
 

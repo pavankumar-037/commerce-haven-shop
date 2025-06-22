@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,6 +36,18 @@ const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => {
   });
 
   const [imagePreview, setImagePreview] = useState('');
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+  const [categories, setCategories] = useState([
+    "Men's Ethnic",
+    "Women's Sarees",
+    "Women's Dresses",
+    "Men's Western",
+    "Women's Western",
+    "Kids",
+    "Footwear",
+    "Accessories"
+  ]);
 
   useEffect(() => {
     if (product) {
@@ -50,16 +62,13 @@ const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => {
       });
       setImagePreview(product.image);
     }
+    
+    // Load saved categories
+    const savedCategories = localStorage.getItem('productCategories');
+    if (savedCategories) {
+      setCategories(JSON.parse(savedCategories));
+    }
   }, [product]);
-
-  const categories = [
-    "Men's Ethnic",
-    "Women's Sarees",
-    "Women's Dresses",
-    "Footwear",
-    "Accessories",
-    "Kids Wear"
-  ];
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -71,6 +80,17 @@ const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => {
         setFormData({ ...formData, image: result });
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAddCategory = () => {
+    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
+      const updatedCategories = [...categories, newCategory.trim()];
+      setCategories(updatedCategories);
+      localStorage.setItem('productCategories', JSON.stringify(updatedCategories));
+      setFormData({ ...formData, category: newCategory.trim() });
+      setNewCategory('');
+      setShowNewCategory(false);
     }
   };
 
@@ -118,7 +138,39 @@ const ProductForm = ({ product, onSave, onCancel }: ProductFormProps) => {
             </div>
 
             <div>
-              <Label htmlFor="category">Category</Label>
+              <div className="flex justify-between items-center mb-2">
+                <Label htmlFor="category">Category</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowNewCategory(!showNewCategory)}
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add New
+                </Button>
+              </div>
+              
+              {showNewCategory && (
+                <div className="flex gap-2 mb-2">
+                  <Input
+                    placeholder="Enter new category"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                  />
+                  <Button type="button" onClick={handleAddCategory}>
+                    Add
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setShowNewCategory(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              )}
+              
               <select
                 id="category"
                 value={formData.category}

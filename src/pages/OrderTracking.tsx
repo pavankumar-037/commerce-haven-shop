@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Package, Search, Truck, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -51,7 +50,6 @@ const OrderTracking = () => {
 
     setIsSearching(true);
     
-    // Simulate API call
     setTimeout(() => {
       const orders = JSON.parse(localStorage.getItem('orders') || '[]');
       const foundOrder = orders.find((o: Order) => 
@@ -120,7 +118,6 @@ const OrderTracking = () => {
 
         <h1 className="text-3xl font-bold mb-8">Track Your Order</h1>
 
-        {/* Tracking Form */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -161,10 +158,8 @@ const OrderTracking = () => {
           </CardContent>
         </Card>
 
-        {/* Order Details */}
         {order && (
           <div className="space-y-6">
-            {/* Order Summary */}
             <Card>
               <CardHeader>
                 <CardTitle>Order Details</CardTitle>
@@ -218,7 +213,6 @@ const OrderTracking = () => {
               </CardContent>
             </Card>
 
-            {/* Tracking Progress */}
             <Card>
               <CardHeader>
                 <CardTitle>Tracking Progress</CardTitle>
@@ -251,7 +245,6 @@ const OrderTracking = () => {
           </div>
         )}
 
-        {/* No Order Found */}
         {!order && !isSearching && (
           <div className="text-center py-12">
             <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
