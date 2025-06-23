@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -8,7 +7,9 @@ import {
   ShoppingBag, 
   Bell, 
   Search as SearchIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +33,11 @@ interface SiteSettings {
     heroSubtitle: string;
     promoBanner: string;
     showPromoBanner: boolean;
+    heroThumbnail: string;
+    trendingCollectionLink: string;
+    offerCollectionLink: string;
+    backgroundStyle: string;
+    colorTheme: string;
   };
   commerce: {
     freeShippingThreshold: number;
@@ -57,8 +63,8 @@ const AdminSettings = () => {
   
   const [settings, setSettings] = useState<SiteSettings>({
     general: {
-      siteName: 'IndiaFashion',
-      siteDescription: 'Your trusted partner for authentic Indian fashion',
+      siteName: 'StyleHub',
+      siteDescription: 'Your trusted partner for authentic fashion',
       contactEmail: 'cuteliitleprincess150@gmail.com',
       contactPhone: '+91 98765 43210'
     },
@@ -66,7 +72,12 @@ const AdminSettings = () => {
       heroTitle: 'Curated Elegance',
       heroSubtitle: 'For Every Occasion - Traditional & Modern Wear',
       promoBanner: '🎉 FREE SHIPPING ON ORDERS ABOVE ₹999 | COD AVAILABLE 🎉',
-      showPromoBanner: true
+      showPromoBanner: true,
+      heroThumbnail: '',
+      trendingCollectionLink: '#trending',
+      offerCollectionLink: '#offers',
+      backgroundStyle: 'gradient',
+      colorTheme: 'muted'
     },
     commerce: {
       freeShippingThreshold: 999,
@@ -80,9 +91,9 @@ const AdminSettings = () => {
       promoEmails: false
     },
     seo: {
-      metaTitle: 'IndiaFashion - Authentic Indian Fashion Online',
-      metaDescription: 'Shop premium Indian ethnic wear, sarees, kurtas, and traditional clothing online. Free shipping, COD available.',
-      keywords: 'indian fashion, ethnic wear, sarees, kurtas, traditional clothing'
+      metaTitle: 'StyleHub - Authentic Fashion Online',
+      metaDescription: 'Shop premium ethnic wear, sarees, kurtas, and traditional clothing online. Free shipping, COD available.',
+      keywords: 'fashion, ethnic wear, sarees, kurtas, traditional clothing'
     }
   });
 
@@ -119,24 +130,41 @@ const AdminSettings = () => {
     });
   };
 
+  const handleThumbnailUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSettings(prev => ({
+          ...prev,
+          appearance: {
+            ...prev.appearance,
+            heroThumbnail: reader.result as string
+          }
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-stone-50">
       <AdminSidebar />
       
       <div className="flex-1 p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Site Settings</h1>
-            <p className="text-gray-600">Configure your website settings and preferences</p>
+            <h1 className="text-3xl font-bold text-stone-800">Site Settings</h1>
+            <p className="text-stone-600">Configure your website settings and preferences</p>
           </div>
-          <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+          <Button onClick={handleSave} className="bg-emerald-600 hover:bg-emerald-700">
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
         </div>
 
         <Tabs defaultValue="general" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-5 bg-stone-100">
             <TabsTrigger value="general" className="flex items-center space-x-2">
               <Globe className="w-4 h-4" />
               <span>General</span>
@@ -160,9 +188,9 @@ const AdminSettings = () => {
           </TabsList>
 
           <TabsContent value="general">
-            <Card>
+            <Card className="border-stone-200">
               <CardHeader>
-                <CardTitle>General Information</CardTitle>
+                <CardTitle className="text-stone-800">General Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -171,6 +199,7 @@ const AdminSettings = () => {
                     id="siteName"
                     value={settings.general.siteName}
                     onChange={(e) => handleInputChange('general', 'siteName', e.target.value)}
+                    className="border-stone-300"
                   />
                 </div>
                 <div>
@@ -179,6 +208,7 @@ const AdminSettings = () => {
                     id="siteDescription"
                     value={settings.general.siteDescription}
                     onChange={(e) => handleInputChange('general', 'siteDescription', e.target.value)}
+                    className="border-stone-300"
                   />
                 </div>
                 <div>
@@ -188,6 +218,7 @@ const AdminSettings = () => {
                     type="email"
                     value={settings.general.contactEmail}
                     onChange={(e) => handleInputChange('general', 'contactEmail', e.target.value)}
+                    className="border-stone-300"
                   />
                 </div>
                 <div>
@@ -196,6 +227,7 @@ const AdminSettings = () => {
                     id="contactPhone"
                     value={settings.general.contactPhone}
                     onChange={(e) => handleInputChange('general', 'contactPhone', e.target.value)}
+                    className="border-stone-300"
                   />
                 </div>
               </CardContent>
@@ -203,17 +235,18 @@ const AdminSettings = () => {
           </TabsContent>
 
           <TabsContent value="appearance">
-            <Card>
+            <Card className="border-stone-200">
               <CardHeader>
-                <CardTitle>Appearance Settings</CardTitle>
+                <CardTitle className="text-stone-800">Appearance Settings</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div>
                   <Label htmlFor="heroTitle">Hero Title</Label>
                   <Input
                     id="heroTitle"
                     value={settings.appearance.heroTitle}
                     onChange={(e) => handleInputChange('appearance', 'heroTitle', e.target.value)}
+                    className="border-stone-300"
                   />
                 </div>
                 <div>
@@ -222,14 +255,94 @@ const AdminSettings = () => {
                     id="heroSubtitle"
                     value={settings.appearance.heroSubtitle}
                     onChange={(e) => handleInputChange('appearance', 'heroSubtitle', e.target.value)}
+                    className="border-stone-300"
                   />
                 </div>
+                
+                <div className="border-2 border-dashed border-stone-300 rounded-lg p-6">
+                  <Label className="text-stone-700 font-medium mb-3 block">Hero Thumbnail Image</Label>
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleThumbnailUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <Button variant="outline" className="border-stone-400 text-stone-700">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Image
+                      </Button>
+                    </div>
+                    {settings.appearance.heroThumbnail && (
+                      <img 
+                        src={settings.appearance.heroThumbnail} 
+                        alt="Hero thumbnail" 
+                        className="w-16 h-16 object-cover rounded-lg border-2 border-stone-200"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="trendingCollectionLink">Trending Collection Link</Label>
+                    <Input
+                      id="trendingCollectionLink"
+                      value={settings.appearance.trendingCollectionLink}
+                      onChange={(e) => handleInputChange('appearance', 'trendingCollectionLink', e.target.value)}
+                      placeholder="#trending or /trending-page"
+                      className="border-stone-300"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="offerCollectionLink">Offer Collection Link</Label>
+                    <Input
+                      id="offerCollectionLink"
+                      value={settings.appearance.offerCollectionLink}
+                      onChange={(e) => handleInputChange('appearance', 'offerCollectionLink', e.target.value)}
+                      placeholder="#offers or /offers-page"
+                      className="border-stone-300"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="colorTheme">Color Theme</Label>
+                    <select
+                      id="colorTheme"
+                      value={settings.appearance.colorTheme}
+                      onChange={(e) => handleInputChange('appearance', 'colorTheme', e.target.value)}
+                      className="w-full px-3 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-400"
+                    >
+                      <option value="muted">Muted Earth Tones</option>
+                      <option value="vibrant">Vibrant Colors</option>
+                      <option value="monochrome">Monochrome</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="backgroundStyle">Background Style</Label>
+                    <select
+                      id="backgroundStyle"
+                      value={settings.appearance.backgroundStyle}
+                      onChange={(e) => handleInputChange('appearance', 'backgroundStyle', e.target.value)}
+                      className="w-full px-3 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-400"
+                    >
+                      <option value="gradient">Gradient</option>
+                      <option value="transparent">Transparent Overlay</option>
+                      <option value="solid">Solid Color</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div>
                   <Label htmlFor="promoBanner">Promo Banner Text</Label>
                   <Input
                     id="promoBanner"
                     value={settings.appearance.promoBanner}
                     onChange={(e) => handleInputChange('appearance', 'promoBanner', e.target.value)}
+                    className="border-stone-300"
                   />
                 </div>
                 <div className="flex items-center space-x-2">

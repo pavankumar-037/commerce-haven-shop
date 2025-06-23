@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ShoppingCart, User, Star, Filter, Gift, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -7,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/hooks/useCart';
 import ComboOffers from '@/components/ComboOffers';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const Index = () => {
   const [products, setProducts] = useState([]);
@@ -15,23 +13,27 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showComboOffers, setShowComboOffers] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [siteSettings, setSiteSettings] = useState(null);
   const { addToCart, getCartItemsCount } = useCart();
 
   const heroSlides = [
     {
       title: "Curated Elegance",
       subtitle: "For Every Occasion - Traditional & Modern Wear",
-      bg: "from-purple-600 to-pink-600"
+      bg: "from-amber-200/80 via-orange-200/80 to-yellow-300/80",
+      overlay: "bg-gradient-to-br from-amber-50/90 via-orange-50/80 to-yellow-100/90"
     },
     {
       title: "Trending Now",
       subtitle: "Discover the Latest Fashion Collections",
-      bg: "from-blue-600 to-teal-600"
+      bg: "from-slate-300/80 via-stone-200/80 to-neutral-300/80",
+      overlay: "bg-gradient-to-br from-slate-50/90 via-stone-50/80 to-neutral-100/90"
     },
     {
       title: "Festival Special",
       subtitle: "Celebrate in Style with Premium Ethnic Wear",
-      bg: "from-orange-500 to-red-600"
+      bg: "from-rose-200/80 via-pink-200/80 to-red-300/80",
+      overlay: "bg-gradient-to-br from-rose-50/90 via-pink-50/80 to-red-100/90"
     }
   ];
 
@@ -44,6 +46,13 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
+    // Load site settings
+    const savedSettings = localStorage.getItem('siteSettings');
+    if (savedSettings) {
+      setSiteSettings(JSON.parse(savedSettings));
+    }
+
+    // Load products
     const adminProducts = localStorage.getItem('adminProducts');
     if (adminProducts) {
       const parsedProducts = JSON.parse(adminProducts);
@@ -253,33 +262,35 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 via-neutral-50 to-slate-50">
       {/* Combo Offers Modal */}
       {showComboOffers && (
         <ComboOffers onClose={() => setShowComboOffers(false)} />
       )}
 
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-md shadow-lg border-b sticky top-0 z-40">
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-2 text-sm font-medium">
-          🎉 FREE SHIPPING ON ORDERS ABOVE ₹999 | COD AVAILABLE 🎉
-        </div>
+      <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-stone-200 sticky top-0 z-40">
+        {siteSettings?.appearance?.showPromoBanner && (
+          <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600 text-white text-center py-2 text-sm font-medium">
+            {siteSettings.appearance.promoBanner}
+          </div>
+        )}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                StyleHub
+              <Link to="/" className="text-2xl font-bold text-stone-800">
+                {siteSettings?.general?.siteName || 'StyleHub'}
               </Link>
             </div>
             
             {/* Search Bar */}
             <div className="flex-1 max-w-lg mx-8">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
                 <Input
                   type="text"
                   placeholder="Search for products, brands and more..."
-                  className="pl-10 rounded-full border-2 focus:border-purple-300"
+                  className="pl-10 rounded-full border-stone-300 focus:border-amber-400 bg-stone-50/50"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -291,24 +302,24 @@ const Index = () => {
               <Button 
                 variant="ghost" 
                 onClick={() => setShowComboOffers(true)}
-                className="text-red-600 hover:text-red-700 font-medium"
+                className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 font-medium"
               >
                 <Gift className="w-5 h-5 mr-2" />
                 Offers
               </Button>
-              <Link to="/track-order" className="text-gray-600 hover:text-purple-600 text-sm font-medium">
+              <Link to="/track-order" className="text-stone-600 hover:text-amber-600 text-sm font-medium">
                 Track Order
               </Link>
-              <Link to="/contact" className="text-gray-600 hover:text-purple-600 text-sm font-medium">
+              <Link to="/contact" className="text-stone-600 hover:text-amber-600 text-sm font-medium">
                 Contact
               </Link>
-              <Link to="/auth" className="text-gray-600 hover:text-purple-600">
+              <Link to="/auth" className="text-stone-600 hover:text-amber-600">
                 <User className="w-6 h-6" />
               </Link>
-              <Link to="/cart" className="relative text-gray-600 hover:text-purple-600">
+              <Link to="/cart" className="relative text-stone-600 hover:text-amber-600">
                 <ShoppingCart className="w-6 h-6" />
                 {getCartItemsCount() > 0 && (
-                  <Badge className="absolute -top-2 -right-2 w-5 h-5 rounded-full p-0 flex items-center justify-center text-xs bg-red-500">
+                  <Badge className="absolute -top-2 -right-2 w-5 h-5 rounded-full p-0 flex items-center justify-center text-xs bg-orange-500 text-white">
                     {getCartItemsCount()}
                   </Badge>
                 )}
@@ -318,7 +329,7 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Carousel */}
+      {/* Hero Carousel with Transparent Overlay */}
       <div className="relative overflow-hidden">
         <div 
           className="flex transition-transform duration-500 ease-in-out"
@@ -327,14 +338,41 @@ const Index = () => {
           {heroSlides.map((slide, index) => (
             <div 
               key={index}
-              className={`min-w-full bg-gradient-to-r ${slide.bg} text-white py-20 flex-shrink-0`}
+              className={`min-w-full bg-gradient-to-br ${slide.bg} relative flex-shrink-0`}
             >
-              <div className="max-w-7xl mx-auto px-4 text-center">
-                <h1 className="text-6xl font-bold mb-4 animate-fade-in">{slide.title}</h1>
-                <p className="text-xl mb-8 animate-fade-in">{slide.subtitle}</p>
-                <Button size="lg" className="bg-white text-gray-800 hover:bg-gray-100 font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all">
-                  Shop Now
-                </Button>
+              <div className={`absolute inset-0 ${slide.overlay}`} />
+              <div className="relative z-10 max-w-7xl mx-auto px-4 py-24 text-center">
+                <div className="backdrop-blur-sm bg-white/20 rounded-3xl p-12 border border-white/30 shadow-2xl">
+                  {siteSettings?.appearance?.heroThumbnail && (
+                    <img 
+                      src={siteSettings.appearance.heroThumbnail} 
+                      alt="Hero" 
+                      className="w-32 h-32 object-cover rounded-full mx-auto mb-6 border-4 border-white/50 shadow-lg"
+                    />
+                  )}
+                  <h1 className="text-6xl font-bold mb-4 text-stone-800 animate-fade-in">
+                    {siteSettings?.appearance?.heroTitle || slide.title}
+                  </h1>
+                  <p className="text-xl mb-8 text-stone-700 animate-fade-in">
+                    {siteSettings?.appearance?.heroSubtitle || slide.subtitle}
+                  </p>
+                  <div className="flex justify-center space-x-4">
+                    <Button 
+                      size="lg" 
+                      className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all"
+                    >
+                      Shop Now
+                    </Button>
+                    <Button 
+                      size="lg" 
+                      variant="outline"
+                      className="border-stone-400 text-stone-700 hover:bg-stone-100 font-semibold px-8 py-3 rounded-full"
+                      onClick={() => window.location.href = siteSettings?.appearance?.trendingCollectionLink || '#trending'}
+                    >
+                      Trending
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
@@ -344,7 +382,7 @@ const Index = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white rounded-full"
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-stone-700 rounded-full backdrop-blur-sm"
           onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
         >
           <ChevronLeft className="w-6 h-6" />
@@ -352,7 +390,7 @@ const Index = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white rounded-full"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-stone-700 rounded-full backdrop-blur-sm"
           onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
         >
           <ChevronRight className="w-6 h-6" />
@@ -372,32 +410,42 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Products Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Featured Collections
-          </h2>
-          <p className="text-gray-600 text-lg mb-8">Discover the latest trends in ethnic and modern fashion</p>
+      {/* Collections Preview Section */}
+      <div className="py-16 bg-gradient-to-br from-amber-50/50 via-orange-50/30 to-yellow-50/50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4 text-stone-800">
+              Featured Collections
+            </h2>
+            <p className="text-stone-600 text-lg mb-8">Discover the latest trends in ethnic and modern fashion</p>
+          </div>
           
-          {/* Category Tags */}
-          <div className="flex justify-center space-x-4 mb-8 flex-wrap">
+          {/* Collection Categories with Transparent Backgrounds */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
             {['Women', 'Men', 'Kids', 'Accessories'].map(category => (
-              <Badge 
+              <div 
                 key={category}
-                variant="outline" 
-                className="text-lg px-6 py-3 mb-2 hover:bg-purple-50 hover:border-purple-300 cursor-pointer transition-all"
+                className="group cursor-pointer"
                 onClick={() => setSelectedCategory(category)}
               >
-                {category}
-              </Badge>
+                <div className="bg-gradient-to-br from-white/60 to-stone-100/40 backdrop-blur-sm rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 border border-white/30">
+                  <div className="text-4xl mb-4">
+                    {category === 'Women' ? '👗' : category === 'Men' ? '👔' : category === 'Kids' ? '🧸' : '👜'}
+                  </div>
+                  <h3 className="text-xl font-semibold text-stone-800 mb-2">{category}</h3>
+                  <p className="text-stone-600 text-sm">New Arrivals</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
+      </div>
 
+      {/* Products Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Category Filter */}
-        <div className="flex items-center space-x-4 mb-8 overflow-x-auto bg-white rounded-full p-2 shadow-md">
-          <Filter className="w-5 h-5 text-gray-600 flex-shrink-0 ml-4" />
+        <div className="flex items-center space-x-4 mb-8 overflow-x-auto bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-md border border-stone-200">
+          <Filter className="w-5 h-5 text-stone-600 flex-shrink-0 ml-4" />
           <div className="flex space-x-2">
             {categories.map(category => (
               <Button
@@ -407,8 +455,8 @@ const Index = () => {
                 onClick={() => setSelectedCategory(category)}
                 className={`whitespace-nowrap rounded-full ${
                   selectedCategory === category 
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white' 
-                    : 'hover:bg-purple-50'
+                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white' 
+                    : 'hover:bg-stone-100 text-stone-700'
                 }`}
               >
                 {category}
@@ -420,9 +468,9 @@ const Index = () => {
         {/* Products Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {filteredProducts.map(product => (
-            <div key={product.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 group border border-gray-100">
+            <div key={product.id} className="bg-white/90 backdrop-blur-sm rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 group border border-stone-200/50">
               {product.discount && (
-                <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
+                <div className="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
                   {product.discount}% OFF
                 </div>
               )}
@@ -432,41 +480,41 @@ const Index = () => {
                   <img 
                     src={product.image} 
                     alt={product.name}
-                    className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </Link>
               
               <div className="p-4">
                 <Link to={`/product/${product.id}`}>
-                  <h3 className="font-semibold text-sm mb-2 hover:text-purple-600 transition-colors line-clamp-2 text-gray-800">
+                  <h3 className="font-semibold text-sm mb-2 hover:text-amber-600 transition-colors line-clamp-2 text-stone-800">
                     {product.name}
                   </h3>
                 </Link>
                 
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center">
-                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                    <span className="text-xs text-gray-600 ml-1">{product.rating?.toFixed(1) || '4.0'}</span>
+                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                    <span className="text-xs text-stone-600 ml-1">{product.rating?.toFixed(1) || '4.0'}</span>
                   </div>
-                  <Badge variant="secondary" className="text-xs bg-purple-50 text-purple-700">
+                  <Badge variant="secondary" className="text-xs bg-stone-100 text-stone-700 border-stone-300">
                     {product.category}
                   </Badge>
                 </div>
                 
                 <div className="mb-4">
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg font-bold text-purple-600">₹{product.price}</span>
+                    <span className="text-lg font-bold text-amber-600">₹{product.price}</span>
                     {product.originalPrice && (
-                      <span className="text-sm text-gray-500 line-through">₹{product.originalPrice}</span>
+                      <span className="text-sm text-stone-500 line-through">₹{product.originalPrice}</span>
                     )}
                   </div>
                 </div>
                 
                 <Button 
                   onClick={() => handleAddToCart(product)}
-                  className="w-full text-xs py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-semibold"
+                  className="w-full text-xs py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-lg font-semibold"
                   size="sm"
                   disabled={!product.inStock}
                 >
@@ -480,10 +528,10 @@ const Index = () => {
         {filteredProducts.length === 0 && (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🔍</div>
-            <p className="text-gray-500 text-xl">No products found matching your search.</p>
+            <p className="text-stone-500 text-xl">No products found matching your search.</p>
             <Button 
               onClick={() => {setSearchTerm(''); setSelectedCategory('All');}}
-              className="mt-4 bg-purple-600 hover:bg-purple-700"
+              className="mt-4 bg-amber-600 hover:bg-amber-700"
             >
               Clear Filters
             </Button>
@@ -492,20 +540,22 @@ const Index = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-16 mt-20">
+      <footer className="bg-gradient-to-r from-stone-800 to-slate-800 text-white py-16 mt-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            StyleHub
+          <h3 className="text-3xl font-bold mb-4 text-amber-400">
+            {siteSettings?.general?.siteName || 'StyleHub'}
           </h3>
-          <p className="text-gray-300 mb-8 text-lg">Your trusted partner for authentic fashion</p>
+          <p className="text-stone-300 mb-8 text-lg">
+            {siteSettings?.general?.siteDescription || 'Your trusted partner for authentic fashion'}
+          </p>
           <div className="flex justify-center space-x-8 mb-6 text-sm">
-            <Link to="/track-order" className="text-gray-300 hover:text-purple-400 transition-colors">Track Order</Link>
-            <span className="text-gray-500">•</span>
-            <Link to="/contact" className="text-gray-300 hover:text-purple-400 transition-colors">Contact Us</Link>
-            <span className="text-gray-500">•</span>
-            <span className="text-gray-300">24/7 Support</span>
+            <Link to="/track-order" className="text-stone-300 hover:text-amber-400 transition-colors">Track Order</Link>
+            <span className="text-stone-500">•</span>
+            <Link to="/contact" className="text-stone-300 hover:text-amber-400 transition-colors">Contact Us</Link>
+            <span className="text-stone-500">•</span>
+            <span className="text-stone-300">24/7 Support</span>
           </div>
-          <Link to="/admin/login" className="text-gray-400 text-sm hover:text-purple-400 transition-colors">
+          <Link to="/admin/login" className="text-stone-400 text-sm hover:text-amber-400 transition-colors">
             Admin Portal
           </Link>
         </div>
