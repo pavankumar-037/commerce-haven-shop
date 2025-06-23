@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Star, ShoppingCart, Plus, Minus, Heart } from 'lucide-react';
@@ -6,76 +7,79 @@ import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/hooks/useCart';
 import ReviewSystem from '@/components/ReviewSystem';
 
-// Enhanced Indian product data
-const mockProducts = [
-  {
-    id: 1,
-    name: "Men's Premium Cotton Kurta Set",
-    price: 1299,
-    originalPrice: 1999,
-    image: "https://images.unsplash.com/photo-1622445275576-721325763eda?w=600&h=600&fit=crop",
-    category: "Men's Ethnic",
-    rating: 4.5,
-    description: "Elegant cotton kurta set perfect for festivals and special occasions. Made from 100% pure cotton with intricate embroidery work. Includes matching pajama. Available in multiple colors and sizes.",
-    reviews: [
-      { id: 1, user: "Rajesh Kumar", rating: 5, comment: "Excellent quality! Perfect fit and very comfortable." },
-      { id: 2, user: "Amit Sharma", rating: 4, comment: "Good material but delivery was slightly delayed." },
-      { id: 3, user: "Suresh Patel", rating: 5, comment: "Worth every rupee. Highly recommended!" }
-    ],
-    discount: 35,
-    inStock: true,
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["White", "Cream", "Blue", "Black"]
-  },
-  {
-    id: 2,
-    name: "Silk Dhoti Kurta",
-    price: 2499,
-    originalPrice: 3999,
-    image: "https://images.unsplash.com/photo-1594736797933-d0301ba9d3be?w=400&h=400&fit=crop",
-    category: "Men's Ethnic",
-    rating: 4.7,
-    description: "Traditional silk dhoti kurta for festivals",
-    discount: 38,
-    inStock: true,
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["Gold", "Maroon", "Cream"]
-  },
-  {
-    id: 3,
-    name: "Nehru Jacket Set",
-    price: 1899,
-    originalPrice: 2899,
-    image: "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=400&h=400&fit=crop",
-    category: "Men's Ethnic",
-    rating: 4.4,
-    description: "Elegant Nehru jacket with kurta",
-    discount: 34,
-    inStock: true,
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    colors: ["Navy", "Grey", "Black"]
-  }
-];
-
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
+  const [imageError, setImageError] = useState(false);
   const { addToCart } = useCart();
 
   useEffect(() => {
-    const foundProduct = mockProducts.find(p => p.id === Number(id)) || mockProducts[0];
-    setProduct(foundProduct);
-    if (foundProduct?.sizes) setSelectedSize(foundProduct.sizes[0]);
-    if (foundProduct?.colors) setSelectedColor(foundProduct.colors[0]);
+    // Load products from admin-managed data (same as Index.tsx)
+    const adminProducts = localStorage.getItem('adminProducts');
+    let products = [];
+    
+    if (adminProducts) {
+      products = JSON.parse(adminProducts);
+    } else {
+      // Default products as fallback
+      products = [
+        {
+          id: 1,
+          name: "Cream Silk Kurta Pajama Set",
+          price: 2299,
+          originalPrice: 3499,
+          image: "/lovable-uploads/c2e7033c-24d2-4791-8ec2-f68e1ea2b10d.png",
+          category: "Men's Ethnic",
+          rating: 4.8,
+          description: "Premium cream silk kurta with matching pajama, perfect for weddings",
+          discount: 34,
+          inStock: true,
+          sizes: ["S", "M", "L", "XL", "XXL"],
+          colors: ["Cream", "White", "Gold"]
+        },
+        {
+          id: 2,
+          name: "Red Embellished Silk Saree",
+          price: 4999,
+          originalPrice: 7499,
+          image: "/lovable-uploads/2372473d-64a9-48f6-99ec-5917a66a92eb.png",
+          category: "Sarees",
+          rating: 4.9,
+          description: "Stunning red silk saree with golden embellishments",
+          discount: 33,
+          inStock: true,
+          sizes: ["Free Size"],
+          colors: ["Red", "Maroon", "Gold"]
+        }
+      ];
+    }
+
+    const foundProduct = products.find(p => p.id === Number(id));
+    
+    if (foundProduct) {
+      setProduct(foundProduct);
+      // Set default selections
+      if (foundProduct.sizes && foundProduct.sizes.length > 0) {
+        setSelectedSize(foundProduct.sizes[0]);
+      }
+      if (foundProduct.colors && foundProduct.colors.length > 0) {
+        setSelectedColor(foundProduct.colors[0]);
+      }
+    }
   }, [id]);
 
   if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg">Product not found</p>
+        <div className="text-center">
+          <p className="text-lg text-gray-600 mb-4">Product not found</p>
+          <Link to="/" className="text-primary hover:underline">
+            Return to Home
+          </Link>
+        </div>
       </div>
     );
   }
@@ -90,10 +94,15 @@ const ProductDetail = () => {
     alert(`Added ${quantity} ${product.name}(s) to cart!`);
   };
 
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   const renderStars = (rating) => {
     const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
+    const numRating = Number(rating) || 0;
+    const fullStars = Math.floor(numRating);
+    const hasHalfStar = numRating % 1 !== 0;
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(<Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />);
@@ -103,7 +112,7 @@ const ProductDetail = () => {
       stars.push(<Star key="half" className="w-4 h-4 fill-yellow-200 text-yellow-400" />);
     }
 
-    const emptyStars = 5 - Math.ceil(rating);
+    const emptyStars = 5 - Math.ceil(numRating);
     for (let i = 0; i < emptyStars; i++) {
       stars.push(<Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />);
     }
@@ -129,11 +138,21 @@ const ProductDetail = () => {
                     {product.discount}% OFF
                   </Badge>
                 )}
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover rounded-lg"
-                />
+                {imageError ? (
+                  <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-gray-500">
+                      <div className="text-4xl mb-2">📷</div>
+                      <p>Image not available</p>
+                    </div>
+                  </div>
+                ) : (
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="w-full h-full object-cover rounded-lg"
+                    onError={handleImageError}
+                  />
+                )}
               </div>
             </div>
 
@@ -151,12 +170,9 @@ const ProductDetail = () => {
                   <div className="flex items-center mr-4">
                     {renderStars(product.rating)}
                     <span className="ml-2 text-sm text-gray-600">
-                      ({product.rating}/5)
+                      ({product.rating || '4.0'}/5)
                     </span>
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {product.reviews?.length || 0} reviews
-                  </span>
                 </div>
 
                 <div className="flex items-center space-x-4 mb-6">
@@ -175,7 +191,7 @@ const ProductDetail = () => {
               </div>
 
               {/* Size Selection */}
-              {product.sizes && (
+              {product.sizes && product.sizes.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium mb-3">Size</h3>
                   <div className="flex space-x-2">
@@ -194,7 +210,7 @@ const ProductDetail = () => {
               )}
 
               {/* Color Selection */}
-              {product.colors && (
+              {product.colors && product.colors.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium mb-3">Color</h3>
                   <div className="flex space-x-2">
@@ -243,9 +259,10 @@ const ProductDetail = () => {
                   onClick={handleAddToCart}
                   size="lg"
                   className="flex-1 bg-orange-500 hover:bg-orange-600"
+                  disabled={!product.inStock}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
-                  Add to Cart
+                  {product.inStock ? 'Add to Cart' : 'Out of Stock'}
                 </Button>
                 <Button variant="outline" size="lg">
                   <Heart className="w-5 h-5" />
