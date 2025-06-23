@@ -17,44 +17,12 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
 
   useEffect(() => {
-    // Load products from admin-managed data (same as Index.tsx)
+    // Load products from admin-managed data
     const adminProducts = localStorage.getItem('adminProducts');
     let products = [];
     
     if (adminProducts) {
       products = JSON.parse(adminProducts);
-    } else {
-      // Default products as fallback
-      products = [
-        {
-          id: 1,
-          name: "Cream Silk Kurta Pajama Set",
-          price: 2299,
-          originalPrice: 3499,
-          image: "/lovable-uploads/c2e7033c-24d2-4791-8ec2-f68e1ea2b10d.png",
-          category: "Men's Ethnic",
-          rating: 4.8,
-          description: "Premium cream silk kurta with matching pajama, perfect for weddings",
-          discount: 34,
-          inStock: true,
-          sizes: ["S", "M", "L", "XL", "XXL"],
-          colors: ["Cream", "White", "Gold"]
-        },
-        {
-          id: 2,
-          name: "Red Embellished Silk Saree",
-          price: 4999,
-          originalPrice: 7499,
-          image: "/lovable-uploads/2372473d-64a9-48f6-99ec-5917a66a92eb.png",
-          category: "Sarees",
-          rating: 4.9,
-          description: "Stunning red silk saree with golden embellishments",
-          discount: 33,
-          inStock: true,
-          sizes: ["Free Size"],
-          colors: ["Red", "Maroon", "Gold"]
-        }
-      ];
     }
 
     const foundProduct = products.find(p => p.id === Number(id));
@@ -73,10 +41,11 @@ const ProductDetail = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-lg text-gray-600 mb-4">Product not found</p>
-          <Link to="/" className="text-primary hover:underline">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center bg-white p-8 rounded-xl shadow-lg">
+          <div className="text-6xl mb-4">😔</div>
+          <p className="text-xl text-gray-600 mb-4">Product not found</p>
+          <Link to="/" className="text-purple-600 hover:text-purple-700 font-medium">
             Return to Home
           </Link>
         </div>
@@ -121,35 +90,35 @@ const ProductDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/" className="inline-flex items-center text-primary hover:text-primary/80 mb-6">
+        <Link to="/" className="inline-flex items-center text-purple-600 hover:text-purple-700 mb-6 font-medium">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Products
         </Link>
 
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
             {/* Product Image */}
             <div className="space-y-4">
               <div className="aspect-square relative">
                 {product.discount && (
-                  <Badge className="absolute top-4 left-4 bg-red-500 text-white z-10">
+                  <Badge className="absolute top-4 left-4 bg-gradient-to-r from-red-500 to-pink-500 text-white z-10 px-3 py-1">
                     {product.discount}% OFF
                   </Badge>
                 )}
                 {imageError ? (
-                  <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                  <div className="w-full h-full bg-gray-100 rounded-xl flex items-center justify-center">
                     <div className="text-center text-gray-500">
-                      <div className="text-4xl mb-2">📷</div>
-                      <p>Image not available</p>
+                      <div className="text-6xl mb-4">📷</div>
+                      <p className="text-lg">Image not available</p>
                     </div>
                   </div>
                 ) : (
                   <img 
                     src={product.image} 
                     alt={product.name}
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-full h-full object-cover rounded-xl shadow-lg"
                     onError={handleImageError}
                   />
                 )}
@@ -159,40 +128,42 @@ const ProductDetail = () => {
             {/* Product Info */}
             <div className="space-y-6">
               <div>
-                <Badge variant="secondary" className="mb-2">
+                <Badge variant="secondary" className="mb-4 bg-purple-50 text-purple-700 px-3 py-1">
                   {product.category}
                 </Badge>
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                <h1 className="text-4xl font-bold text-gray-900 mb-4">
                   {product.name}
                 </h1>
                 
-                <div className="flex items-center mb-4">
+                <div className="flex items-center mb-6">
                   <div className="flex items-center mr-4">
                     {renderStars(product.rating)}
-                    <span className="ml-2 text-sm text-gray-600">
+                    <span className="ml-2 text-sm text-gray-600 font-medium">
                       ({product.rating || '4.0'}/5)
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-4 mb-6">
-                  <span className="text-4xl font-bold text-orange-600">₹{product.price}</span>
+                  <span className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    ₹{product.price}
+                  </span>
                   {product.originalPrice && (
                     <span className="text-xl text-gray-500 line-through">₹{product.originalPrice}</span>
                   )}
                   {product.discount && (
-                    <Badge className="bg-green-500">Save ₹{product.originalPrice - product.price}</Badge>
+                    <Badge className="bg-green-500 px-3 py-1">Save ₹{product.originalPrice - product.price}</Badge>
                   )}
                 </div>
 
-                <p className="text-gray-600 mb-6">
+                <p className="text-gray-600 mb-6 text-lg leading-relaxed">
                   {product.description}
                 </p>
               </div>
 
               {/* Size Selection */}
               {product.sizes && product.sizes.length > 0 && (
-                <div>
+                <div className="bg-gray-50 p-4 rounded-xl">
                   <h3 className="text-sm font-medium mb-3">Size</h3>
                   <div className="flex space-x-2">
                     {product.sizes.map(size => (
@@ -201,6 +172,7 @@ const ProductDetail = () => {
                         variant={selectedSize === size ? "default" : "outline"}
                         size="sm"
                         onClick={() => setSelectedSize(size)}
+                        className={selectedSize === size ? "bg-purple-600 hover:bg-purple-700" : ""}
                       >
                         {size}
                       </Button>
@@ -211,7 +183,7 @@ const ProductDetail = () => {
 
               {/* Color Selection */}
               {product.colors && product.colors.length > 0 && (
-                <div>
+                <div className="bg-gray-50 p-4 rounded-xl">
                   <h3 className="text-sm font-medium mb-3">Color</h3>
                   <div className="flex space-x-2">
                     {product.colors.map(color => (
@@ -220,6 +192,7 @@ const ProductDetail = () => {
                         variant={selectedColor === color ? "default" : "outline"}
                         size="sm"
                         onClick={() => setSelectedColor(color)}
+                        className={selectedColor === color ? "bg-purple-600 hover:bg-purple-700" : ""}
                       >
                         {color}
                       </Button>
@@ -231,22 +204,24 @@ const ProductDetail = () => {
               {/* Quantity Selector */}
               <div className="flex items-center space-x-4 mb-6">
                 <span className="text-sm font-medium">Quantity:</span>
-                <div className="flex items-center border rounded-md">
+                <div className="flex items-center border-2 border-gray-200 rounded-lg">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => quantity > 1 && setQuantity(quantity - 1)}
                     disabled={quantity <= 1}
+                    className="hover:bg-purple-50"
                   >
                     <Minus className="w-4 h-4" />
                   </Button>
-                  <span className="px-4 py-2 text-center min-w-[50px]">
+                  <span className="px-4 py-2 text-center min-w-[50px] font-medium">
                     {quantity}
                   </span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setQuantity(quantity + 1)}
+                    className="hover:bg-purple-50"
                   >
                     <Plus className="w-4 h-4" />
                   </Button>
@@ -258,21 +233,21 @@ const ProductDetail = () => {
                 <Button 
                   onClick={handleAddToCart}
                   size="lg"
-                  className="flex-1 bg-orange-500 hover:bg-orange-600"
+                  className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 text-lg rounded-xl"
                   disabled={!product.inStock}
                 >
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   {product.inStock ? 'Add to Cart' : 'Out of Stock'}
                 </Button>
-                <Button variant="outline" size="lg">
+                <Button variant="outline" size="lg" className="border-2 hover:bg-purple-50 rounded-xl">
                   <Heart className="w-5 h-5" />
                 </Button>
               </div>
 
               {/* Delivery Info */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-semibold text-blue-800 mb-2">🚚 Delivery Information</h4>
-                <ul className="text-sm text-blue-700 space-y-1">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-purple-200 rounded-xl p-6">
+                <h4 className="font-semibold text-purple-800 mb-3 text-lg">🚚 Delivery Information</h4>
+                <ul className="text-sm text-purple-700 space-y-2">
                   <li>• Free delivery on orders above ₹999</li>
                   <li>• Cash on Delivery available</li>
                   <li>• Easy returns within 30 days</li>
@@ -283,7 +258,7 @@ const ProductDetail = () => {
           </div>
 
           {/* Reviews Section */}
-          <div className="border-t p-8">
+          <div className="border-t bg-gray-50 p-8">
             <ReviewSystem productId={product.id} />
           </div>
         </div>
