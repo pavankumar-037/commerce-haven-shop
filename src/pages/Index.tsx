@@ -16,26 +16,28 @@ const Index = () => {
   const [siteSettings, setSiteSettings] = useState(null);
   const { addToCart, getCartItemsCount } = useCart();
 
-  const heroSlides = [
+  const defaultHeroSlides = [
     {
       title: "Curated Elegance",
       subtitle: "For Every Occasion - Traditional & Modern Wear",
-      bg: "from-amber-200/80 via-orange-200/80 to-yellow-300/80",
-      overlay: "bg-gradient-to-br from-amber-50/90 via-orange-50/80 to-yellow-100/90"
+      bgGradient: "from-amber-200/80 via-orange-200/80 to-yellow-300/80",
+      overlayGradient: "bg-gradient-to-br from-amber-50/90 via-orange-50/80 to-yellow-100/90"
     },
     {
       title: "Trending Now",
       subtitle: "Discover the Latest Fashion Collections",
-      bg: "from-slate-300/80 via-stone-200/80 to-neutral-300/80",
-      overlay: "bg-gradient-to-br from-slate-50/90 via-stone-50/80 to-neutral-100/90"
+      bgGradient: "from-slate-300/80 via-stone-200/80 to-neutral-300/80",
+      overlayGradient: "bg-gradient-to-br from-slate-50/90 via-stone-50/80 to-neutral-100/90"
     },
     {
       title: "Festival Special",
       subtitle: "Celebrate in Style with Premium Ethnic Wear",
-      bg: "from-rose-200/80 via-pink-200/80 to-red-300/80",
-      overlay: "bg-gradient-to-br from-rose-50/90 via-pink-50/80 to-red-100/90"
+      bgGradient: "from-rose-200/80 via-pink-200/80 to-red-300/80",
+      overlayGradient: "bg-gradient-to-br from-rose-50/90 via-pink-50/80 to-red-100/90"
     }
   ];
+
+  const [heroSlides, setHeroSlides] = useState(defaultHeroSlides);
 
   useEffect(() => {
     const slideInterval = setInterval(() => {
@@ -43,13 +45,19 @@ const Index = () => {
     }, 5000);
 
     return () => clearInterval(slideInterval);
-  }, []);
+  }, [heroSlides.length]);
 
   useEffect(() => {
     // Load site settings
     const savedSettings = localStorage.getItem('siteSettings');
     if (savedSettings) {
-      setSiteSettings(JSON.parse(savedSettings));
+      const settings = JSON.parse(savedSettings);
+      setSiteSettings(settings);
+      
+      // Use admin-controlled carousel slides if available
+      if (settings.appearance?.carouselSlides && settings.appearance.carouselSlides.length > 0) {
+        setHeroSlides(settings.appearance.carouselSlides);
+      }
     }
 
     // Load products
@@ -261,8 +269,47 @@ const Index = () => {
     addToCart(product);
   };
 
+  const handleTrendingClick = () => {
+    if (siteSettings?.appearance?.trendingCollectionLink?.startsWith('#')) {
+      const element = document.querySelector(siteSettings.appearance.trendingCollectionLink);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else if (siteSettings?.appearance?.trendingCollectionLink) {
+      window.location.href = siteSettings.appearance.trendingCollectionLink;
+    }
+  };
+
+  const handleOffersClick = () => {
+    if (siteSettings?.appearance?.offerCollectionLink?.startsWith('#')) {
+      setShowComboOffers(true);
+    } else if (siteSettings?.appearance?.offerCollectionLink) {
+      window.location.href = siteSettings.appearance.offerCollectionLink;
+    } else {
+      setShowComboOffers(true);
+    }
+  };
+
+  // Dynamic color styling based on admin settings
+  const primaryColor = siteSettings?.appearance?.primaryColor || '#f59e0b';
+  const secondaryColor = siteSettings?.appearance?.secondaryColor || '#78716c';
+  const accentColor = siteSettings?.appearance?.accentColor || '#ea580c';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 via-neutral-50 to-slate-50">
+      {/* Custom CSS for dynamic colors */}
+      <style>
+        {`
+          .dynamic-primary { background-color: ${primaryColor} !important; }
+          .dynamic-primary-hover:hover { background-color: ${primaryColor}dd !important; }
+          .dynamic-secondary { color: ${secondaryColor} !important; }
+          .dynamic-accent { background-color: ${accentColor} !important; }
+          .dynamic-gradient { 
+            background: linear-gradient(135deg, ${primaryColor}22 0%, ${accentColor}33 100%) !important; 
+          }
+        `}
+      </style>
+
       {/* Combo Offers Modal */}
       {showComboOffers && (
         <ComboOffers onClose={() => setShowComboOffers(false)} />
@@ -271,7 +318,12 @@ const Index = () => {
       {/* Header */}
       <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-stone-200 sticky top-0 z-40">
         {siteSettings?.appearance?.showPromoBanner && (
-          <div className="bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600 text-white text-center py-2 text-sm font-medium">
+          <div 
+            className="text-white text-center py-2 text-sm font-medium dynamic-gradient"
+            style={{ 
+              background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)` 
+            }}
+          >
             {siteSettings.appearance.promoBanner}
           </div>
         )}
@@ -301,7 +353,7 @@ const Index = () => {
             <div className="flex items-center space-x-4">
               <Button 
                 variant="ghost" 
-                onClick={() => setShowComboOffers(true)}
+                onClick={handleOffersClick}
                 className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 font-medium"
               >
                 <Gift className="w-5 h-5 mr-2" />
@@ -329,7 +381,7 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero Carousel with Transparent Overlay */}
+      {/* Hero Carousel with Admin-Controlled Slides */}
       <div className="relative overflow-hidden">
         <div 
           className="flex transition-transform duration-500 ease-in-out"
@@ -338,9 +390,9 @@ const Index = () => {
           {heroSlides.map((slide, index) => (
             <div 
               key={index}
-              className={`min-w-full bg-gradient-to-br ${slide.bg} relative flex-shrink-0`}
+              className={`min-w-full bg-gradient-to-br ${slide.bgGradient} relative flex-shrink-0`}
             >
-              <div className={`absolute inset-0 ${slide.overlay}`} />
+              <div className={`absolute inset-0 ${slide.overlayGradient}`} />
               <div className="relative z-10 max-w-7xl mx-auto px-4 py-24 text-center">
                 <div className="backdrop-blur-sm bg-white/20 rounded-3xl p-12 border border-white/30 shadow-2xl">
                   {siteSettings?.appearance?.heroThumbnail && (
@@ -351,15 +403,19 @@ const Index = () => {
                     />
                   )}
                   <h1 className="text-6xl font-bold mb-4 text-stone-800 animate-fade-in">
-                    {siteSettings?.appearance?.heroTitle || slide.title}
+                    {slide.title}
                   </h1>
                   <p className="text-xl mb-8 text-stone-700 animate-fade-in">
-                    {siteSettings?.appearance?.heroSubtitle || slide.subtitle}
+                    {slide.subtitle}
                   </p>
                   <div className="flex justify-center space-x-4">
                     <Button 
                       size="lg" 
-                      className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all"
+                      className="text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all"
+                      style={{ 
+                        backgroundColor: primaryColor,
+                        '--tw-shadow-color': `${primaryColor}44`
+                      }}
                     >
                       Shop Now
                     </Button>
@@ -367,7 +423,7 @@ const Index = () => {
                       size="lg" 
                       variant="outline"
                       className="border-stone-400 text-stone-700 hover:bg-stone-100 font-semibold px-8 py-3 rounded-full"
-                      onClick={() => window.location.href = siteSettings?.appearance?.trendingCollectionLink || '#trending'}
+                      onClick={handleTrendingClick}
                     >
                       Trending
                     </Button>
@@ -411,7 +467,7 @@ const Index = () => {
       </div>
 
       {/* Collections Preview Section */}
-      <div className="py-16 bg-gradient-to-br from-amber-50/50 via-orange-50/30 to-yellow-50/50">
+      <div id="trending" className="py-16 bg-gradient-to-br from-amber-50/50 via-orange-50/30 to-yellow-50/50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4 text-stone-800">
@@ -455,9 +511,12 @@ const Index = () => {
                 onClick={() => setSelectedCategory(category)}
                 className={`whitespace-nowrap rounded-full ${
                   selectedCategory === category 
-                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white' 
+                    ? 'text-white' 
                     : 'hover:bg-stone-100 text-stone-700'
                 }`}
+                style={selectedCategory === category ? {
+                  background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`
+                } : {}}
               >
                 {category}
               </Button>
@@ -505,7 +564,7 @@ const Index = () => {
                 
                 <div className="mb-4">
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg font-bold text-amber-600">₹{product.price}</span>
+                    <span className="text-lg font-bold" style={{ color: primaryColor }}>₹{product.price}</span>
                     {product.originalPrice && (
                       <span className="text-sm text-stone-500 line-through">₹{product.originalPrice}</span>
                     )}
@@ -514,7 +573,10 @@ const Index = () => {
                 
                 <Button 
                   onClick={() => handleAddToCart(product)}
-                  className="w-full text-xs py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-lg font-semibold"
+                  className="w-full text-xs py-2 text-white rounded-lg font-semibold"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)` 
+                  }}
                   size="sm"
                   disabled={!product.inStock}
                 >
@@ -531,7 +593,8 @@ const Index = () => {
             <p className="text-stone-500 text-xl">No products found matching your search.</p>
             <Button 
               onClick={() => {setSearchTerm(''); setSelectedCategory('All');}}
-              className="mt-4 bg-amber-600 hover:bg-amber-700"
+              style={{ backgroundColor: primaryColor }}
+              className="mt-4 text-white"
             >
               Clear Filters
             </Button>
@@ -542,7 +605,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-gradient-to-r from-stone-800 to-slate-800 text-white py-16 mt-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h3 className="text-3xl font-bold mb-4 text-amber-400">
+          <h3 className="text-3xl font-bold mb-4" style={{ color: primaryColor }}>
             {siteSettings?.general?.siteName || 'StyleHub'}
           </h3>
           <p className="text-stone-300 mb-8 text-lg">
