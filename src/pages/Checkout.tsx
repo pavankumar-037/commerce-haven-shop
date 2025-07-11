@@ -193,17 +193,19 @@ const Checkout = () => {
           break;
 
         case "upi":
-          await PaymentGateway.initiateUPIPayment({
+          const upiResponse = await PaymentGateway.simulateModernUPIPayment({
             amount: paymentAmount,
+            currency: "INR",
             orderId,
             customerInfo,
             onSuccess: (response) => handlePaymentSuccess(response, orderId),
             onFailure: handlePaymentFailure,
           });
+          await handlePaymentSuccess(upiResponse, orderId);
           break;
 
         case "card":
-          const cardResponse = await PaymentGateway.simulateCardPayment({
+          const cardResponse = await PaymentGateway.simulateSecureCardPayment({
             amount: paymentAmount,
             currency: "INR",
             orderId,
@@ -212,6 +214,18 @@ const Checkout = () => {
             onFailure: handlePaymentFailure,
           });
           await handlePaymentSuccess(cardResponse, orderId);
+          break;
+
+        case "stripe":
+          const stripeResponse = await PaymentGateway.processStripePayment({
+            amount: paymentAmount,
+            currency: "INR",
+            orderId,
+            customerInfo,
+            onSuccess: (response) => handlePaymentSuccess(response, orderId),
+            onFailure: handlePaymentFailure,
+          });
+          await handlePaymentSuccess(stripeResponse, orderId);
           break;
 
         case "netbanking":
