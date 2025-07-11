@@ -246,7 +246,7 @@ const OrderTracking = () => {
               <Label htmlFor="orderId">Order ID</Label>
               <Input
                 id="orderId"
-                placeholder="Enter your order ID (e.g., ORD-001)"
+                placeholder="Enter your order ID (full ID or last 8 characters)"
                 value={trackingData.orderId}
                 onChange={(e) =>
                   handleInputChange("orderId", e.target.value.toUpperCase())
