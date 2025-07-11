@@ -377,10 +377,9 @@ const AdminOrders = () => {
                     );
                   })}
                 </TableBody>
-              </Table>
-            </div>
+                              </Table>
 
-            {filteredOrders.length === 0 && (
+                {filteredOrders.length === 0 && !loading && (
               <div className="text-center py-12">
                 <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">
