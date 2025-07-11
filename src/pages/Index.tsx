@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/hooks/useCart';
 import ComboOffers from '@/components/ComboOffers';
 import HeroCarousel from '@/components/HeroCarousel';
+import DynamicOffersSection from '@/components/DynamicOffersSection';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [products, setProducts] = useState([]);
@@ -14,6 +16,7 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showComboOffers, setShowComboOffers] = useState(false);
   const [siteSettings, setSiteSettings] = useState(null);
+  const [themeSettings, setThemeSettings] = useState(null);
   const { addToCart, getCartItemsCount } = useCart();
 
   const defaultHeroSlides = [
@@ -40,17 +43,38 @@ const Index = () => {
   const [heroSlides, setHeroSlides] = useState(defaultHeroSlides);
 
   useEffect(() => {
-    // Load site settings
-    const savedSettings = localStorage.getItem('siteSettings');
-    if (savedSettings) {
-      const settings = JSON.parse(savedSettings);
-      setSiteSettings(settings);
-      
-      // Use admin-controlled carousel slides if available
-      if (settings.appearance?.carouselSlides && settings.appearance.carouselSlides.length > 0) {
-        setHeroSlides(settings.appearance.carouselSlides);
+    // Load site settings and theme settings
+    const loadSettings = async () => {
+      const savedSettings = localStorage.getItem('siteSettings');
+      if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        setSiteSettings(settings);
+        
+        // Use admin-controlled carousel slides if available
+        if (settings.appearance?.carouselSlides && settings.appearance.carouselSlides.length > 0) {
+          setHeroSlides(settings.appearance.carouselSlides);
+        }
       }
-    }
+
+      // Fetch theme settings from Supabase
+      try {
+        const { data } = await supabase
+          .from('theme_settings')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (data) {
+          setThemeSettings(data);
+          applyThemeToDOM(data);
+        }
+      } catch (error) {
+        console.error('Error fetching theme settings:', error);
+      }
+    };
+
+    loadSettings();
 
     // Load products
     const adminProducts = localStorage.getItem('adminProducts');
@@ -249,6 +273,46 @@ const Index = () => {
     }
   }, []);
 
+  const applyThemeToDOM = (theme: any) => {
+    if (!theme) return;
+    
+    const root = document.documentElement;
+    
+    // Convert hex to HSL for CSS variables
+    const hexToHsl = (hex: string) => {
+      const r = parseInt(hex.slice(1, 3), 16) / 255;
+      const g = parseInt(hex.slice(3, 5), 16) / 255;
+      const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+
+      if (max === min) {
+        h = s = 0;
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+          default: h = 0;
+        }
+        h /= 6;
+      }
+
+      return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+    };
+
+    // Apply theme colors as CSS variables
+    root.style.setProperty('--primary', hexToHsl(theme.primary_color));
+    root.style.setProperty('--secondary', hexToHsl(theme.secondary_color));
+    root.style.setProperty('--background', hexToHsl(theme.background_color));
+    root.style.setProperty('--accent', hexToHsl(theme.accent_color));
+  };
+
   const categories = ['All', 'Men', 'Women', 'Kids', 'Accessories'];
 
   const filteredProducts = products.filter(product => {
@@ -282,10 +346,10 @@ const Index = () => {
     }
   };
 
-  // Dynamic color styling based on admin settings
-  const primaryColor = siteSettings?.appearance?.primaryColor || '#f59e0b';
-  const secondaryColor = siteSettings?.appearance?.secondaryColor || '#78716c';
-  const accentColor = siteSettings?.appearance?.accentColor || '#ea580c';
+  // Dynamic color styling based on admin settings or theme settings
+  const primaryColor = themeSettings?.primary_color || siteSettings?.appearance?.primaryColor || '#f59e0b';
+  const secondaryColor = themeSettings?.secondary_color || siteSettings?.appearance?.secondaryColor || '#78716c';
+  const accentColor = themeSettings?.accent_color || siteSettings?.appearance?.accentColor || '#ea580c';
 
   const handleScrollToProducts = () => {
     const element = document.getElementById('products-section');
@@ -389,36 +453,27 @@ const Index = () => {
         onTrendingClick={handleTrendingClick}
       />
 
-      {/* Collections Preview Section */}
-      <div id="trending" className="py-16 bg-gradient-to-br from-amber-50/50 via-orange-50/30 to-yellow-50/50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 text-stone-800">
-              Featured Collections
-            </h2>
-            <p className="text-stone-600 text-lg mb-8">Discover the latest trends in ethnic and modern fashion</p>
-          </div>
-          
-          {/* Collection Categories with Transparent Backgrounds */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-            {['Women', 'Men', 'Kids', 'Accessories'].map(category => (
-              <div 
-                key={category}
-                className="group cursor-pointer"
-                onClick={() => setSelectedCategory(category)}
-              >
-                <div className="bg-gradient-to-br from-white/60 to-stone-100/40 backdrop-blur-sm rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 border border-white/30">
-                  <div className="text-4xl mb-4">
-                    {category === 'Women' ? '👗' : category === 'Men' ? '👔' : category === 'Kids' ? '🧸' : '👜'}
-                  </div>
-                  <h3 className="text-xl font-semibold text-stone-800 mb-2">{category}</h3>
-                  <p className="text-stone-600 text-sm">New Arrivals</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Dynamic Offers Sections */}
+      <DynamicOffersSection
+        category="curated"
+        title="Curated Elegance"
+        subtitle="Handpicked premium collections for discerning tastes"
+        className="bg-gradient-to-br from-amber-50/50 to-orange-50/50"
+      />
+      
+      <DynamicOffersSection
+        category="trending"
+        title="Trending Now"
+        subtitle="Discover what's popular and in demand"
+        className="bg-gradient-to-br from-slate-50/50 to-stone-50/50"
+      />
+      
+      <DynamicOffersSection
+        category="festival"
+        title="Festival Special"
+        subtitle="Celebrate in style with our special festival collection"
+        className="bg-gradient-to-br from-rose-50/50 to-pink-50/50"
+      />
 
       {/* Products Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

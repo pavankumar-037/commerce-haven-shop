@@ -20,6 +20,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import AdminSidebar from '@/components/AdminSidebar';
 import AdminAppearanceSettings from '@/components/AdminAppearanceSettings';
+import AdminThemeSettings from '@/components/AdminThemeSettings';
 import { useToast } from '@/hooks/use-toast';
 
 interface CarouselSlide {

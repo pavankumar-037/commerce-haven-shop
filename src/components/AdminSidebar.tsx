@@ -36,6 +36,11 @@ const AdminSidebar = () => {
       path: '/admin/orders'
     },
     {
+      icon: Tag,
+      label: 'Offers Manager',
+      path: '/admin/offers-manager'
+    },
+    {
       icon: Gift,
       label: 'Combo Offers',
       path: '/admin/offers'

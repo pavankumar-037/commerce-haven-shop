@@ -19,6 +19,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminProducts from "./pages/AdminProducts";
 import AdminSections from "./pages/AdminSections";
 import AdminOrders from "./pages/AdminOrders";
+import AdminOffersManager from "./pages/AdminOffersManager";
 import AdminOffers from "./pages/AdminOffers";
 import AdminCoupons from "./pages/AdminCoupons";
 import AdminMessages from "./pages/AdminMessages";
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/admin/products" element={<AdminProducts />} />
           <Route path="/admin/sections" element={<AdminSections />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/offers-manager" element={<AdminOffersManager />} />
           <Route path="/admin/offers" element={<AdminOffers />} />
           <Route path="/admin/coupons" element={<AdminCoupons />} />
           <Route path="/admin/messages" element={<AdminMessages />} />
