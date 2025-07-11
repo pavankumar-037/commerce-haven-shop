@@ -34,23 +34,80 @@ export interface OrderData {
 export const ordersService = {
   async testConnection(): Promise<boolean> {
     try {
-      const { error } = await supabase.from("orders").select("count").limit(0);
-      if (error) {
-        console.error("Supabase connection test failed:", {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-          hint: error.hint,
-          fullError: error,
-        });
+      // First test with a table we know exists (offers or theme_settings)
+      console.log("Testing basic Supabase connection...");
+      const { error: basicError } = await supabase
+        .from("offers")
+        .select("count")
+        .limit(0);
+
+      if (basicError) {
+        console.error(
+          "Basic Supabase connection failed:",
+          JSON.stringify(
+            {
+              message: basicError.message,
+              code: basicError.code,
+              details: basicError.details,
+              hint: basicError.hint,
+            },
+            null,
+            2,
+          ),
+        );
         return false;
       }
+
+      console.log("✅ Basic Supabase connection successful");
+
+      // Now test orders table specifically
+      console.log("Testing orders table access...");
+      const { error: ordersError } = await supabase
+        .from("orders")
+        .select("count")
+        .limit(0);
+
+      if (ordersError) {
+        console.error(
+          "Orders table access failed:",
+          JSON.stringify(
+            {
+              message: ordersError.message,
+              code: ordersError.code,
+              details: ordersError.details,
+              hint: ordersError.hint,
+            },
+            null,
+            2,
+          ),
+        );
+
+        // Check if it's a missing table error
+        if (
+          ordersError.code === "PGRST106" ||
+          ordersError.message?.includes("does not exist")
+        ) {
+          console.error("❌ ORDERS TABLE MISSING - This is the root cause!");
+          console.error(
+            "💡 Solution: Run the CREATE_ORDERS_TABLE.sql script in your Supabase dashboard",
+          );
+        }
+
+        return false;
+      }
+
+      console.log("✅ Orders table access successful");
       return true;
     } catch (error) {
-      console.error("Supabase connection test exception:", {
-        message: error instanceof Error ? error.message : "Unknown error",
-        error: error,
-      });
+      const errorDetails = {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        type: typeof error,
+      };
+      console.error(
+        "Supabase connection test exception:",
+        JSON.stringify(errorDetails, null, 2),
+      );
       return false;
     }
   },
