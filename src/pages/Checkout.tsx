@@ -32,6 +32,7 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState("");
   const [couponError, setCouponError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isCartLoaded, setIsCartLoaded] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     firstName: "",
@@ -52,10 +53,19 @@ const Checkout = () => {
   const total = subtotal - couponDiscount + shippingCost;
 
   useEffect(() => {
-    if (cartItems.length === 0) {
+    // Give time for cart to load from localStorage
+    const timer = setTimeout(() => {
+      setIsCartLoaded(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (isCartLoaded && cartItems.length === 0) {
       navigate("/cart");
     }
-  }, [cartItems, navigate]);
+  }, [cartItems, navigate, isCartLoaded]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
