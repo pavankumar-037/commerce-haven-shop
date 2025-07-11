@@ -235,6 +235,17 @@ const AdminOrders = () => {
               Manage customer orders and delivery status
             </p>
           </div>
+          <Button
+            onClick={refreshOrders}
+            disabled={refreshing}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw
+              className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </Button>
         </div>
 
         <Card className="mb-6">
