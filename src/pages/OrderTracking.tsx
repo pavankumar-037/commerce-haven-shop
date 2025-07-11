@@ -177,7 +177,7 @@ const OrderTracking = () => {
     }
   };
 
-  const getTrackingSteps = (status: Order["status"]) => {
+  const getTrackingSteps = (status: string) => {
     const steps = [
       {
         status: "pending",
