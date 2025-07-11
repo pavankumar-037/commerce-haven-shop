@@ -52,7 +52,6 @@ const Checkout = () => {
   });
 
   const subtotal = getCartTotal();
-  const { validateCoupon } = useCoupons();
   const couponDiscount = appliedCoupon
     ? validateCoupon(appliedCoupon.code, subtotal).discount
     : 0;
