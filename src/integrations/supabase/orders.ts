@@ -89,7 +89,7 @@ export const ordersService = {
         ) {
           console.error("❌ ORDERS TABLE MISSING - This is the root cause!");
           console.error(
-            "💡 Solution: Run the CREATE_ORDERS_TABLE.sql script in your Supabase dashboard",
+            "�� Solution: Run the CREATE_ORDERS_TABLE.sql script in your Supabase dashboard",
           );
         }
 
@@ -190,11 +190,17 @@ export const ordersService = {
 
       return { data, error: null };
     } catch (error) {
-      console.error("Exception creating order:", {
-        message: error instanceof Error ? error.message : "Unknown error",
-        stack: error instanceof Error ? error.stack : undefined,
-        error: error,
-      });
+      const errorDetails = JSON.stringify(
+        {
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          type: typeof error,
+        },
+        null,
+        2,
+      );
+
+      console.error("Exception creating order:", errorDetails);
 
       // Fallback to localStorage if Supabase fails
       try {
