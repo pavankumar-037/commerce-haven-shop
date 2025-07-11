@@ -111,24 +111,30 @@ const Checkout = () => {
     orderData: OrderData,
   ): Promise<string | null> => {
     try {
+      console.log("Creating order in database with data:", orderData);
+
       const { data, error } = await ordersService.createOrder(orderData);
 
       if (error || !data) {
-        console.error("Failed to create order:", error);
+        console.error("Failed to create order:", { error, data });
+        const errorMessage = error?.message || "Unknown error occurred";
         toast({
           title: "Failed to create order",
-          description: "Please try again or contact support",
+          description: `Error: ${errorMessage}`,
           variant: "destructive",
         });
         return null;
       }
 
+      console.log("Order created successfully:", data);
       return data.id;
     } catch (error) {
-      console.error("Error creating order:", error);
+      console.error("Exception creating order:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
       toast({
         title: "Failed to create order",
-        description: "Please try again or contact support",
+        description: `Exception: ${errorMessage}`,
         variant: "destructive",
       });
       return null;
