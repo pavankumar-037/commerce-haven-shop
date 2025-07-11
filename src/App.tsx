@@ -61,6 +61,9 @@ const App = () => (
             <Route path="/admin/messages" element={<AdminMessages />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
 
+            {/* Debug route for development */}
+            <Route path="/debug" element={<Debug />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
