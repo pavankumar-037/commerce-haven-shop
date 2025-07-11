@@ -159,13 +159,27 @@ export const ordersService = {
       console.log("Supabase insert result:", { data, error });
 
       if (error) {
-        console.error("Supabase error creating order:", {
-          error,
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-        });
+        const errorDetails = JSON.stringify(
+          {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint,
+          },
+          null,
+          2,
+        );
+
+        console.error("Supabase error creating order:", errorDetails);
+
+        // Check for specific error types
+        if (error.code === "PGRST106") {
+          console.error("❌ ORDERS TABLE MISSING!");
+          console.error("💡 Run CREATE_ORDERS_TABLE.sql in Supabase dashboard");
+        } else if (error.code === "PGRST301") {
+          console.error("❌ PERMISSION DENIED - Check RLS policies");
+        }
+
         return {
           data: null,
           error: new Error(
