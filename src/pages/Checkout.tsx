@@ -27,7 +27,13 @@ import { PaymentGateway } from "@/services/paymentGateway";
 const Checkout = () => {
   const navigate = useNavigate();
   const { cartItems, getCartTotal, clearCart } = useCart();
-  const { appliedCoupon, applyCoupon, removeCoupon, useCoupon } = useCoupons();
+  const {
+    appliedCoupon,
+    applyCoupon,
+    removeCoupon,
+    useCoupon,
+    validateCoupon,
+  } = useCoupons();
 
   const [couponCode, setCouponCode] = useState("");
   const [couponError, setCouponError] = useState("");
