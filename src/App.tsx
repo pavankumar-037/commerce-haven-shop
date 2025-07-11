@@ -33,21 +33,19 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+        <ErrorBoundary>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
-            <Route
-              path="/checkout"
-              element={
-                <ErrorBoundary>
-                  <Checkout />
-                </ErrorBoundary>
-              }
-            />
+                        <Route path="/checkout" element={
+              <ErrorBoundary>
+                <Checkout />
+              </ErrorBoundary>
+            } />
             <Route path="/auth" element={<Auth />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/orders" element={<Orders />} />
@@ -67,7 +65,7 @@ const App = () => (
             <Route path="/admin/offers" element={<AdminOffers />} />
             <Route path="/admin/coupons" element={<AdminCoupons />} />
             <Route path="/admin/messages" element={<AdminMessages />} />
-            <Route path="/admin/settings" element={<AdminSettings />} />
+                        <Route path="/admin/settings" element={<AdminSettings />} />
 
             {/* Debug route for development */}
             <Route path="/debug" element={<Debug />} />
