@@ -22,20 +22,14 @@ interface Props {
 
 const AdminThemeSettings = ({ onThemeUpdate }: Props) => {
   const { toast } = useToast();
+  const { theme, updateTheme, isLoading } = useTheme();
 
-  const [themeSettings, setThemeSettings] = useState<ThemeSettings>({
-    primary_color: "#f59e0b",
-    secondary_color: "#78716c",
-    background_color: "#fafaf9",
-    accent_color: "#ea580c",
-  });
-
-  const [loading, setLoading] = useState(true);
+  const [themeSettings, setThemeSettings] = useState<ThemeSettings>(theme);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchThemeSettings();
-  }, []);
+    setThemeSettings(theme);
+  }, [theme]);
 
   const fetchThemeSettings = async () => {
     try {
