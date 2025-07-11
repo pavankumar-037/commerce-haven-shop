@@ -183,12 +183,14 @@ const AdminOrders = () => {
     }
   };
 
-  const getStatusColor = (status: Order["status"]) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
         return "bg-yellow-500";
-      case "processing":
+      case "confirmed":
         return "bg-blue-500";
+      case "processing":
+        return "bg-blue-600";
       case "shipped":
         return "bg-purple-500";
       case "delivered":
@@ -200,10 +202,12 @@ const AdminOrders = () => {
     }
   };
 
-  const getStatusIcon = (status: Order["status"]) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
         return Clock;
+      case "confirmed":
+        return CheckCircle;
       case "processing":
         return Package;
       case "shipped":
