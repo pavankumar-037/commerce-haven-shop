@@ -287,11 +287,11 @@ const OrderTracking = () => {
                   <div>
                     <h4 className="font-semibold mb-2">Customer Information</h4>
                     <p className="text-sm text-gray-600">
-                      {order.customerInfo.firstName}{" "}
-                      {order.customerInfo.lastName}
+                      {getCustomerInfo(order).firstName}{" "}
+                      {getCustomerInfo(order).lastName}
                     </p>
                     <p className="text-sm text-gray-600">
-                      {order.customerInfo.email}
+                      {getCustomerInfo(order).email}
                     </p>
                   </div>
                 </div>
