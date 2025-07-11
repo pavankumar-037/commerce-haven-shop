@@ -275,10 +275,10 @@ const OrderTracking = () => {
                   <div>
                     <h4 className="font-semibold mb-2">Order Information</h4>
                     <p className="text-sm text-gray-600">
-                      Order ID: {order.id}
+                      Order ID: #{order.id.slice(-8).toUpperCase()}
                     </p>
                     <p className="text-sm text-gray-600">
-                      Date: {new Date(order.createdAt).toLocaleDateString()}
+                      Date: {new Date(getOrderDate(order)).toLocaleDateString()}
                     </p>
                     <p className="text-sm text-gray-600">
                       Total: ₹{order.total.toFixed(2)}
