@@ -131,7 +131,19 @@ const OrderTracking = () => {
     }
   };
 
-  const getStatusColor = (status: Order["status"]) => {
+  const getOrderStatus = (order: Order) => {
+    return order.order_status || order.status || "pending";
+  };
+
+  const getOrderDate = (order: Order) => {
+    return order.created_at || order.createdAt || new Date().toISOString();
+  };
+
+  const getCustomerInfo = (order: Order) => {
+    return order.customer_info || order.customerInfo;
+  };
+
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
         return "bg-yellow-500";
