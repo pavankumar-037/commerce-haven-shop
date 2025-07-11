@@ -28,6 +28,31 @@ const Debug = () => {
     }
   };
 
+  const checkTables = async () => {
+    setLoading(true);
+    try {
+      const result = await listTables();
+      setTableInfo(result);
+      if (result.success) {
+        toast({
+          title: "Table check completed",
+          description: "Check console for detailed results",
+        });
+      } else {
+        toast({
+          title: "Table check failed",
+          description: "Check console for error details",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Table check error:", error);
+      setTableInfo({ success: false, error });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const testOrderCreation = async () => {
     setLoading(true);
     try {
