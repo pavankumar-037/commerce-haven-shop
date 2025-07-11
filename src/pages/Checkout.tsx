@@ -85,7 +85,158 @@ const Checkout = () => {
     toast({ title: "Coupon removed" });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const createOrderInDatabase = async (
+    orderData: OrderData,
+  ): Promise<string | null> => {
+    try {
+      const { data, error } = await ordersService.createOrder(orderData);
+
+      if (error || !data) {
+        console.error("Failed to create order:", error);
+        toast({
+          title: "Failed to create order",
+          description: "Please try again or contact support",
+          variant: "destructive",
+        });
+        return null;
+      }
+
+      return data.id;
+    } catch (error) {
+      console.error("Error creating order:", error);
+      toast({
+        title: "Failed to create order",
+        description: "Please try again or contact support",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
+  const handlePaymentSuccess = async (
+    paymentResponse: any,
+    orderId: string,
+  ) => {
+    try {
+      // Update order status in database
+      await ordersService.updateOrderStatus(orderId, "confirmed", "completed");
+
+      // Use coupon if applied
+      if (appliedCoupon) {
+        useCoupon(appliedCoupon.id);
+      }
+
+      // Clear cart only after successful payment
+      clearCart();
+
+      toast({
+        title: "Order placed successfully!",
+        description:
+          "Payment completed. You will receive a confirmation email shortly.",
+      });
+
+      // Navigate to success page
+      navigate("/order-success", {
+        state: {
+          orderId,
+          paymentId: paymentResponse.paymentId,
+          amount: total,
+          method: paymentResponse.method,
+        },
+      });
+    } catch (error) {
+      console.error("Error handling payment success:", error);
+      toast({
+        title: "Payment successful but order update failed",
+        description: "Please contact support with your payment ID",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePaymentFailure = (error: any) => {
+    console.error("Payment failed:", error);
+    toast({
+      title: "Payment failed",
+      description:
+        error.message ||
+        "Please try again or choose a different payment method",
+      variant: "destructive",
+    });
+    setIsProcessing(false);
+  };
+
+  const processPayment = async (orderId: string) => {
+    const customerInfo = {
+      name: `${formData.firstName} ${formData.lastName}`,
+      email: formData.email,
+      phone: formData.phone,
+    };
+
+    const paymentAmount = Math.round(total * 100); // Convert to paise
+
+    try {
+      switch (formData.paymentMethod) {
+        case "cod":
+          const codResponse = await PaymentGateway.processCODPayment(orderId);
+          await handlePaymentSuccess(codResponse, orderId);
+          break;
+
+        case "upi":
+          await PaymentGateway.initiateUPIPayment({
+            amount: paymentAmount,
+            orderId,
+            customerInfo,
+            onSuccess: (response) => handlePaymentSuccess(response, orderId),
+            onFailure: handlePaymentFailure,
+          });
+          break;
+
+        case "card":
+          const cardResponse = await PaymentGateway.simulateCardPayment({
+            amount: paymentAmount,
+            currency: "INR",
+            orderId,
+            customerInfo,
+            onSuccess: (response) => handlePaymentSuccess(response, orderId),
+            onFailure: handlePaymentFailure,
+          });
+          await handlePaymentSuccess(cardResponse, orderId);
+          break;
+
+        case "netbanking":
+          const netbankingResponse =
+            await PaymentGateway.simulateNetBankingPayment({
+              amount: paymentAmount,
+              currency: "INR",
+              orderId,
+              customerInfo,
+              onSuccess: (response) => handlePaymentSuccess(response, orderId),
+              onFailure: handlePaymentFailure,
+            });
+          await handlePaymentSuccess(netbankingResponse, orderId);
+          break;
+
+        case "razorpay":
+          await PaymentGateway.initiatePayment({
+            amount: paymentAmount,
+            currency: "INR",
+            orderId,
+            customerInfo,
+            onSuccess: (response) => handlePaymentSuccess(response, orderId),
+            onFailure: handlePaymentFailure,
+          });
+          break;
+
+        default:
+          throw new Error("Invalid payment method");
+      }
+    } catch (error) {
+      handlePaymentFailure(error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Basic validation
@@ -106,40 +257,50 @@ const Checkout = () => {
       return;
     }
 
-    // Create order
-    const order = {
-      id: Date.now().toString(),
-      items: cartItems,
-      customerInfo: formData,
-      subtotal: Number(subtotal.toFixed(2)),
-      couponDiscount: Number(couponDiscount.toFixed(2)),
-      shippingCost: Number(shippingCost.toFixed(2)),
-      total: Number(total.toFixed(2)),
-      appliedCoupon: appliedCoupon,
-      status: "pending",
-      createdAt: new Date().toISOString(),
-      paymentMethod: formData.paymentMethod,
-    };
+    setIsProcessing(true);
 
-    // Save order to localStorage
-    const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-    localStorage.setItem("orders", JSON.stringify([...existingOrders, order]));
+    try {
+      // Create order data
+      const orderData: OrderData = {
+        userEmail: formData.email,
+        customerInfo: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
+        },
+        items: cartItems,
+        subtotal: Number(subtotal.toFixed(2)),
+        couponDiscount: Number(couponDiscount.toFixed(2)),
+        shippingCost: Number(shippingCost.toFixed(2)),
+        total: Number(total.toFixed(2)),
+        appliedCoupon: appliedCoupon,
+        paymentMethod: formData.paymentMethod,
+      };
 
-    // Use coupon if applied
-    if (appliedCoupon) {
-      useCoupon(appliedCoupon.id);
+      // Create order in database first
+      const orderId = await createOrderInDatabase(orderData);
+
+      if (!orderId) {
+        setIsProcessing(false);
+        return;
+      }
+
+      // Process payment
+      await processPayment(orderId);
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      toast({
+        title: "Checkout failed",
+        description: "Please try again or contact support",
+        variant: "destructive",
+      });
+      setIsProcessing(false);
     }
-
-    // Clear cart
-    clearCart();
-
-    toast({
-      title: "Order placed successfully!",
-      description: "You will receive a confirmation email shortly.",
-    });
-
-    // Navigate to success page
-    navigate("/order-success", { state: { order } });
   };
 
   return (
