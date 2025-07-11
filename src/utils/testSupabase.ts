@@ -81,7 +81,13 @@ export const testSupabaseConnection = async () => {
       .single();
 
     if (insertError) {
-      console.error("Insert test failed:", insertError);
+      console.error("Insert test failed:", {
+        message: insertError.message,
+        code: insertError.code,
+        details: insertError.details,
+        hint: insertError.hint,
+        fullError: insertError,
+      });
       return { success: false, error: insertError };
     }
 
