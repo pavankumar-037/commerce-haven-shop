@@ -113,6 +113,10 @@ const Checkout = () => {
     try {
       console.log("Creating order in database with data:", orderData);
 
+      // Test connection first
+      const isConnected = await ordersService.testConnection();
+      console.log("Supabase connection test result:", isConnected);
+
       const { data, error } = await ordersService.createOrder(orderData);
 
       if (error || !data) {
