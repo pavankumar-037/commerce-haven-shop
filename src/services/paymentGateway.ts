@@ -1,4 +1,5 @@
-// Payment Gateway Service - Razorpay Integration
+// Modern Payment Gateway Service - Stripe & Razorpay Integration
+import { loadStripe, Stripe } from "@stripe/stripe-js";
 
 declare global {
   interface Window {
