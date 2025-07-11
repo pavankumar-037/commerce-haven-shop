@@ -259,72 +259,125 @@ const Orders = () => {
             <span className="ml-2">Loading orders...</span>
           </div>
         ) : orders.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No orders yet</h2>
-            <p className="text-gray-600 mb-6">
-              Start shopping to see your orders here!
-            </p>
-            <Link to="/">
-              <Button>Start Shopping</Button>
-            </Link>
-          </div>
+          <Card>
+            <CardContent className="p-12 text-center">
+              <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold mb-2">No orders found</h2>
+              <p className="text-gray-600 mb-6">
+                {emailFilter
+                  ? `No orders found for ${emailFilter}. Try a different email address.`
+                  : "Start shopping to see your orders here!"}
+              </p>
+              <Link to="/">
+                <Button className="bg-orange-500 hover:bg-orange-600">
+                  <Package className="w-4 h-4 mr-2" />
+                  Start Shopping
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
         ) : (
           <div className="space-y-6">
-            {mockOrders.map((order) => (
-              <div
-                key={order.id}
-                className="bg-white rounded-lg shadow-lg overflow-hidden"
-              >
-                <div className="p-6 border-b border-gray-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-4">
-                      <h3 className="text-lg font-semibold">
-                        Order {order.id}
-                      </h3>
-                      <Badge className={getStatusColor(order.status)}>
-                        {order.status}
-                      </Badge>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-600 flex items-center">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        {new Date(order.date).toLocaleDateString()}
-                      </p>
-                      <p className="text-lg font-semibold flex items-center">
-                        <DollarSign className="w-4 h-4 mr-1" />
-                        {order.total.toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    {order.items.map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex justify-between items-center text-sm"
-                      >
-                        <span>
-                          {item.name} × {item.quantity}
-                        </span>
-                        <span>${item.price.toFixed(2)}</span>
+            {orders.map((order) => {
+              const StatusIcon = getStatusIcon(order.status);
+              return (
+                <Card key={order.id} className="overflow-hidden">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-4">
+                        <h3 className="text-lg font-semibold">
+                          Order #{order.id.slice(-8).toUpperCase()}
+                        </h3>
+                        <Badge
+                          className={`${getStatusColor(order.status)} flex items-center gap-1`}
+                        >
+                          <StatusIcon className="w-3 h-3" />
+                          {order.status.charAt(0).toUpperCase() +
+                            order.status.slice(1)}
+                        </Badge>
+                        <Badge
+                          className={getPaymentStatusColor(order.paymentStatus)}
+                        >
+                          Payment: {order.paymentStatus}
+                        </Badge>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600 flex items-center justify-end">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          {new Date(order.date).toLocaleDateString()}
+                        </p>
+                        <p className="text-lg font-semibold flex items-center justify-end">
+                          <DollarSign className="w-4 h-4 mr-1" />₹
+                          {order.total.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
 
-                <div className="p-4 bg-gray-50">
-                  <div className="flex space-x-3">
-                    <Button variant="outline" size="sm">
-                      Track Order
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      Reorder Items
-                    </Button>
+                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <p className="text-sm text-gray-600">Customer Email:</p>
+                        <p className="font-medium">{order.customerEmail}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Payment Method:</p>
+                        <p className="font-medium capitalize">
+                          {order.paymentMethod}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-4">
+                      <h4 className="font-semibold mb-3">Order Items:</h4>
+                      <div className="space-y-2">
+                        {order.items.map((item, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between text-sm bg-gray-50 p-3 rounded"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="w-12 h-12 object-cover rounded"
+                              />
+                              <div>
+                                <p className="font-medium">{item.name}</p>
+                                <p className="text-gray-600">
+                                  Qty: {item.quantity}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="font-semibold">
+                              ₹{(item.price * item.quantity).toFixed(2)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+
+                  <div className="px-6 py-4 bg-gray-50 border-t">
+                    <div className="flex flex-wrap gap-3">
+                      <Link to={`/track-order?id=${order.id}`}>
+                        <Button variant="outline" size="sm">
+                          <Truck className="w-4 h-4 mr-2" />
+                          Track Order
+                        </Button>
+                      </Link>
+                      <Button variant="outline" size="sm">
+                        <Package className="w-4 h-4 mr-2" />
+                        Reorder Items
+                      </Button>
+                      {order.status === "delivered" && (
+                        <Button variant="outline" size="sm">
+                          Rate & Review
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
