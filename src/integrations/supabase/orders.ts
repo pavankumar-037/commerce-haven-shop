@@ -36,6 +36,24 @@ export const ordersService = {
     orderData: OrderData,
   ): Promise<{ data: Order | null; error: Error | null }> {
     try {
+      // Validate required fields
+      if (
+        !orderData.userEmail ||
+        !orderData.customerInfo ||
+        !orderData.items ||
+        orderData.items.length === 0
+      ) {
+        return { data: null, error: new Error("Missing required order data") };
+      }
+
+      console.log("Creating order with data:", {
+        userEmail: orderData.userEmail,
+        customerInfo: orderData.customerInfo,
+        itemsCount: orderData.items.length,
+        total: orderData.total,
+        paymentMethod: orderData.paymentMethod,
+      });
+
       const orderInsert: OrderInsert = {
         user_email: orderData.userEmail,
         customer_info: orderData.customerInfo,
