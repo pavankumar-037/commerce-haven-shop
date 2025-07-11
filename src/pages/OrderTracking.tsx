@@ -67,7 +67,7 @@ const OrderTracking = () => {
     setError("");
   };
 
-  const handleTrackOrder = () => {
+  const handleTrackOrder = async () => {
     if (!trackingData.email.trim() || !trackingData.orderId.trim()) {
       setError("Please enter both email and order ID");
       return;
@@ -75,24 +75,60 @@ const OrderTracking = () => {
 
     setIsSearching(true);
 
-    setTimeout(() => {
-      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      const foundOrder = orders.find(
-        (o: Order) =>
-          o.id === trackingData.orderId &&
-          o.customerInfo.email.toLowerCase() ===
-            trackingData.email.toLowerCase(),
-      );
+    try {
+      // First check Supabase for orders
+      const { data: supabaseOrders, error } =
+        await ordersService.getOrdersByEmail(trackingData.email.trim());
 
-      if (foundOrder) {
-        setOrder(foundOrder);
+      if (!error && supabaseOrders) {
+        // Look for order by ID (support both full UUID and last 8 characters)
+        const foundOrder = supabaseOrders.find((order) => {
+          const orderIdUpper = trackingData.orderId.toUpperCase();
+          const fullId = order.id.toUpperCase();
+          const shortId = order.id.slice(-8).toUpperCase();
+
+          return fullId === orderIdUpper || shortId === orderIdUpper;
+        });
+
+        if (foundOrder) {
+          setOrder(foundOrder);
+          setError("");
+          setIsSearching(false);
+          return;
+        }
+      }
+
+      // Fallback to localStorage for legacy orders
+      const localOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+      const foundLocalOrder = localOrders.find((o: Order) => {
+        const customerEmail = o.customerInfo?.email || o.customer_info?.email;
+        return (
+          (o.id === trackingData.orderId ||
+            o.id.slice(-8).toUpperCase() ===
+              trackingData.orderId.toUpperCase()) &&
+          customerEmail?.toLowerCase() === trackingData.email.toLowerCase()
+        );
+      });
+
+      if (foundLocalOrder) {
+        setOrder(foundLocalOrder);
         setError("");
       } else {
         setOrder(null);
-        setError("Order not found. Please check your email and order ID.");
+        setError(
+          "Order not found. Please check your email and order ID. You can use either the full order ID or just the last 8 characters.",
+        );
       }
+    } catch (err) {
+      console.error("Error tracking order:", err);
+      toast({
+        title: "Error tracking order",
+        description: "Please try again or contact support",
+        variant: "destructive",
+      });
+    } finally {
       setIsSearching(false);
-    }, 1000);
+    }
   };
 
   const getStatusColor = (status: Order["status"]) => {
