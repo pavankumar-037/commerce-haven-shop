@@ -354,14 +354,12 @@ const AdminOrders = () => {
                             <select
                               value={order.status}
                               onChange={(e) =>
-                                updateOrderStatus(
-                                  order.id,
-                                  e.target.value as Order["status"],
-                                )
+                                updateOrderStatus(order.id, e.target.value)
                               }
                               className="text-sm border rounded px-2 py-1"
                             >
                               <option value="pending">Pending</option>
+                              <option value="confirmed">Confirmed</option>
                               <option value="processing">Processing</option>
                               <option value="shipped">Shipped</option>
                               <option value="delivered">Delivered</option>
