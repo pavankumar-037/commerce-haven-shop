@@ -146,17 +146,41 @@ const AdminOrders = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const updateOrderStatus = (orderId: string, newStatus: Order["status"]) => {
-    const updatedOrders = orders.map((order) =>
-      order.id === orderId ? { ...order, status: newStatus } : order,
-    );
-    setOrders(updatedOrders);
-    localStorage.setItem("orders", JSON.stringify(updatedOrders));
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    try {
+      const { error } = await ordersService.updateOrderStatus(
+        orderId,
+        newStatus,
+      );
 
-    toast({
-      title: "Order Updated",
-      description: `Order ${orderId} status changed to ${newStatus}`,
-    });
+      if (error) {
+        console.error("Error updating order status:", error);
+        toast({
+          title: "Error updating order",
+          description: "Failed to update order status",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update local state
+      const updatedOrders = orders.map((order) =>
+        order.id === orderId ? { ...order, status: newStatus } : order,
+      );
+      setOrders(updatedOrders);
+
+      toast({
+        title: "Order Updated",
+        description: `Order ${orderId} status changed to ${newStatus}`,
+      });
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      toast({
+        title: "Error updating order",
+        description: "Failed to update order status",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusColor = (status: Order["status"]) => {
