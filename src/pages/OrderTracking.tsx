@@ -19,20 +19,35 @@ import { toast } from "@/hooks/use-toast";
 
 interface Order {
   id: string;
-  customerInfo: {
+  user_email?: string;
+  customer_info: {
     email: string;
     firstName: string;
     lastName: string;
   };
   items: Array<{
+    id: number;
     name: string;
     price: number;
     quantity: number;
     image: string;
   }>;
   total: number;
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-  createdAt: string;
+  order_status:
+    | "pending"
+    | "processing"
+    | "shipped"
+    | "delivered"
+    | "cancelled";
+  created_at: string;
+  // Legacy format support
+  customerInfo?: {
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
+  status?: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  createdAt?: string;
 }
 
 const OrderTracking = () => {
