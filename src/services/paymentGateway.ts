@@ -173,7 +173,9 @@ export class PaymentGateway {
   }
 
   // Simulate Net Banking payment for demo purposes
-  static simulateNetBankingPayment(options: PaymentOptions): Promise<any> {
+  static simulateNetBankingPayment(
+    options: Omit<PaymentOptions, "onSuccess" | "onFailure">,
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (Math.random() > 0.05) {
@@ -191,7 +193,9 @@ export class PaymentGateway {
   }
 
   // Modern Stripe payment processing
-  static async processStripePayment(options: PaymentOptions): Promise<any> {
+  static async processStripePayment(
+    options: Omit<PaymentOptions, "onSuccess" | "onFailure">,
+  ): Promise<any> {
     try {
       const stripe = await this.loadStripe();
       if (!stripe) {
@@ -220,7 +224,9 @@ export class PaymentGateway {
   }
 
   // Simulate modern UPI payment (PhonePe, Google Pay, Paytm style)
-  static simulateModernUPIPayment(options: PaymentOptions): Promise<any> {
+  static simulateModernUPIPayment(
+    options: Omit<PaymentOptions, "onSuccess" | "onFailure">,
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       // Simulate UPI app redirect and processing
       setTimeout(() => {
@@ -242,7 +248,9 @@ export class PaymentGateway {
   }
 
   // Simulate modern card payment with better security
-  static simulateSecureCardPayment(options: PaymentOptions): Promise<any> {
+  static simulateSecureCardPayment(
+    options: Omit<PaymentOptions, "onSuccess" | "onFailure">,
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       // Simulate 3D Secure and tokenization
       setTimeout(() => {
