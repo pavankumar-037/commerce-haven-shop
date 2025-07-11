@@ -326,13 +326,13 @@ const OrderTracking = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-lg font-semibold">Current Status:</span>
                   <Badge
-                    className={`${getStatusColor(order.status)} text-white`}
+                    className={`${getStatusColor(getOrderStatus(order))} text-white`}
                   >
-                    {React.createElement(getStatusIcon(order.status), {
+                    {React.createElement(getStatusIcon(getOrderStatus(order)), {
                       className: "w-4 h-4 mr-1",
                     })}
-                    {order.status.charAt(0).toUpperCase() +
-                      order.status.slice(1)}
+                    {getOrderStatus(order).charAt(0).toUpperCase() +
+                      getOrderStatus(order).slice(1)}
                   </Badge>
                 </div>
               </CardContent>
