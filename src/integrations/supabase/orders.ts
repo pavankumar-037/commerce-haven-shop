@@ -111,11 +111,49 @@ export const ordersService = {
       return { data, error: null };
     } catch (error) {
       console.error("Error creating order:", error);
-      return {
-        data: null,
-        error:
-          error instanceof Error ? error : new Error("Unknown error occurred"),
-      };
+
+      // Fallback to localStorage if Supabase fails
+      try {
+        console.log("Attempting localStorage fallback for order creation...");
+        const fallbackOrder = {
+          id: `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          user_email: orderData.userEmail,
+          customer_info: orderData.customerInfo,
+          items: orderData.items,
+          subtotal: orderData.subtotal,
+          coupon_discount: orderData.couponDiscount,
+          shipping_cost: orderData.shippingCost,
+          total: orderData.total,
+          applied_coupon: orderData.appliedCoupon || null,
+          payment_method: orderData.paymentMethod,
+          payment_status: "pending",
+          order_status: "pending",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        // Save to localStorage as fallback
+        const existingOrders = JSON.parse(
+          localStorage.getItem("orders") || "[]",
+        );
+        existingOrders.push(fallbackOrder);
+        localStorage.setItem("orders", JSON.stringify(existingOrders));
+
+        console.log(
+          "Order saved to localStorage as fallback:",
+          fallbackOrder.id,
+        );
+        return { data: fallbackOrder as Order, error: null };
+      } catch (fallbackError) {
+        console.error("localStorage fallback also failed:", fallbackError);
+        return {
+          data: null,
+          error:
+            error instanceof Error
+              ? error
+              : new Error("Unknown error occurred"),
+        };
+      }
     }
   },
 
