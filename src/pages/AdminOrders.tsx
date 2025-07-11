@@ -289,7 +289,7 @@ const AdminOrders = () => {
           <CardHeader>
             <CardTitle>Orders ({filteredOrders.length})</CardTitle>
           </CardHeader>
-                    <CardContent>
+          <CardContent>
             {loading ? (
               <div className="flex justify-center items-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -298,96 +298,98 @@ const AdminOrders = () => {
             ) : (
               <div className="overflow-x-auto">
                 <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Order ID</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Items</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredOrders.map((order) => {
-                    const StatusIcon = getStatusIcon(order.status);
-                    return (
-                      <TableRow key={order.id}>
-                        <TableCell className="font-medium">
-                          {order.id}
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">
-                              {order.customerName}
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Order ID</TableHead>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Items</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredOrders.map((order) => {
+                      const StatusIcon = getStatusIcon(order.status);
+                      return (
+                        <TableRow key={order.id}>
+                          <TableCell className="font-medium">
+                            {order.id}
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">
+                                {order.customerName}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {order.email}
+                              </div>
                             </div>
-                            <div className="text-sm text-gray-500">
-                              {order.email}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={order.items[0]?.image}
+                                alt={order.items[0]?.name}
+                                className="w-8 h-8 object-cover rounded"
+                              />
+                              <span className="text-sm">
+                                {order.items.length} item
+                                {order.items.length > 1 ? "s" : ""}
+                              </span>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <img
-                              src={order.items[0]?.image}
-                              alt={order.items[0]?.name}
-                              className="w-8 h-8 object-cover rounded"
-                            />
-                            <span className="text-sm">
-                              {order.items.length} item
-                              {order.items.length > 1 ? "s" : ""}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-semibold">
-                          ₹{order.total.toLocaleString()}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            className={`${getStatusColor(order.status)} text-white`}
-                          >
-                            <StatusIcon className="w-3 h-3 mr-1" />
-                            {order.status.charAt(0).toUpperCase() +
-                              order.status.slice(1)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {new Date(order.orderDate).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex space-x-1">
-                            <select
-                              value={order.status}
-                              onChange={(e) =>
-                                updateOrderStatus(order.id, e.target.value)
-                              }
-                              className="text-sm border rounded px-2 py-1"
+                          </TableCell>
+                          <TableCell className="font-semibold">
+                            ₹{order.total.toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              className={`${getStatusColor(order.status)} text-white`}
                             >
-                              <option value="pending">Pending</option>
-                              <option value="confirmed">Confirmed</option>
-                              <option value="processing">Processing</option>
-                              <option value="shipped">Shipped</option>
-                              <option value="delivered">Delivered</option>
-                              <option value="cancelled">Cancelled</option>
-                            </select>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-                              </Table>
+                              <StatusIcon className="w-3 h-3 mr-1" />
+                              {order.status.charAt(0).toUpperCase() +
+                                order.status.slice(1)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {new Date(order.orderDate).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex space-x-1">
+                              <select
+                                value={order.status}
+                                onChange={(e) =>
+                                  updateOrderStatus(order.id, e.target.value)
+                                }
+                                className="text-sm border rounded px-2 py-1"
+                              >
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="processing">Processing</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                              </select>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
 
                 {filteredOrders.length === 0 && !loading && (
-              <div className="text-center py-12">
-                <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                  No orders found
-                </h3>
-                <p className="text-gray-500">
-                  Try adjusting your search or filter criteria
-                </p>
+                  <div className="text-center py-12">
+                    <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                      No orders found
+                    </h3>
+                    <p className="text-gray-500">
+                      Try adjusting your search or filter criteria
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
