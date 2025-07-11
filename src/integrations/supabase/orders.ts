@@ -57,8 +57,19 @@ export const ordersService = {
         .single();
 
       if (error) {
-        console.error("Error creating order:", error);
-        return { data: null, error: new Error(error.message) };
+        console.error("Supabase error creating order:", {
+          error,
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        return {
+          data: null,
+          error: new Error(
+            `Order creation failed: ${error.message} (Code: ${error.code})`,
+          ),
+        };
       }
 
       return { data, error: null };
