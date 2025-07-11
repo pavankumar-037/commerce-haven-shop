@@ -62,10 +62,12 @@ const Debug = () => {
       const { data, error } = await ordersService.createOrder(testOrderData);
 
       if (error) {
-        setTestResult(`Error: ${error.message}`);
+        const errorMessage = error.message || "Unknown error";
+        setTestResult(`Error: ${errorMessage}`);
+        console.error("Full error details:", error);
         toast({
           title: "Order creation failed",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
       } else if (data) {
