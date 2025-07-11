@@ -34,10 +34,12 @@ export interface UPIPaymentOptions {
 }
 
 export class PaymentGateway {
-  private static readonly RAZORPAY_KEY_ID = "rzp_test_1234567890"; // Test key - replace with actual
+  private static readonly RAZORPAY_KEY_ID =
+    import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_1234567890";
   private static readonly RAZORPAY_SCRIPT_URL =
     "https://checkout.razorpay.com/v1/checkout.js";
-  private static readonly STRIPE_PUBLIC_KEY = "pk_test_51234567890"; // Test key - replace with actual
+  private static readonly STRIPE_PUBLIC_KEY =
+    import.meta.env.VITE_STRIPE_PUBLIC_KEY || "pk_test_51234567890";
   private static stripePromise: Promise<Stripe | null> | null = null;
 
   static async loadRazorpayScript(): Promise<boolean> {
