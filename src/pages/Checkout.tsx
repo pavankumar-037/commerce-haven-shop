@@ -46,8 +46,9 @@ const Checkout = () => {
   });
 
   const subtotal = getCartTotal();
+  const { validateCoupon } = useCoupons();
   const couponDiscount = appliedCoupon
-    ? applyCoupon(appliedCoupon.code, subtotal).discount
+    ? validateCoupon(appliedCoupon.code, subtotal).discount
     : 0;
   const shippingCost = subtotal - couponDiscount > 999 ? 0 : 50;
   const total = subtotal - couponDiscount + shippingCost;
