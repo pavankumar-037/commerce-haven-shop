@@ -112,7 +112,7 @@ const AdminThemeSettings = ({ onThemeUpdate }: Props) => {
     setThemeSettings(updatedTheme);
 
     // Apply changes immediately for preview
-    applyThemeToDOM(updatedTheme);
+    updateTheme(updatedTheme);
     onThemeUpdate?.(updatedTheme);
   };
 
