@@ -525,6 +525,16 @@ const Checkout = () => {
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="stripe" id="stripe" />
+                    <Label
+                      htmlFor="stripe"
+                      className="flex items-center cursor-pointer"
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Stripe (Secure Payments)
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
                     <RadioGroupItem value="razorpay" id="razorpay" />
                     <Label
                       htmlFor="razorpay"
