@@ -32,6 +32,54 @@ export interface OrderData {
 }
 
 export const ordersService = {
+  async createOrdersTable(): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log("Creating orders table...");
+
+      // Create the orders table
+      const { error } = await supabase.rpc("sql", {
+        query: `
+        CREATE TABLE IF NOT EXISTS public.orders (
+          id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+          user_email text NOT NULL,
+          customer_info jsonb NOT NULL,
+          items jsonb NOT NULL,
+          subtotal decimal(10,2) NOT NULL,
+          coupon_discount decimal(10,2) DEFAULT 0,
+          shipping_cost decimal(10,2) DEFAULT 0,
+          total decimal(10,2) NOT NULL,
+          applied_coupon jsonb,
+          payment_method text NOT NULL,
+          payment_status text DEFAULT 'pending',
+          order_status text DEFAULT 'pending',
+          created_at timestamp with time zone DEFAULT now(),
+          updated_at timestamp with time zone DEFAULT now()
+        );
+
+        ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+
+        CREATE POLICY IF NOT EXISTS "Allow all operations on orders"
+        ON public.orders FOR ALL USING (true) WITH CHECK (true);
+        `,
+      });
+
+      if (error) {
+        console.error(
+          "Failed to create orders table:",
+          JSON.stringify(error, null, 2),
+        );
+        return { success: false, error: error.message };
+      }
+
+      console.log("✅ Orders table created successfully");
+      return { success: true };
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error("Exception creating orders table:", errorMsg);
+      return { success: false, error: errorMsg };
+    }
+  },
+
   async testConnection(): Promise<boolean> {
     try {
       // First test with a table we know exists (offers or theme_settings)
@@ -89,7 +137,7 @@ export const ordersService = {
         ) {
           console.error("❌ ORDERS TABLE MISSING - This is the root cause!");
           console.error(
-            "�� Solution: Run the CREATE_ORDERS_TABLE.sql script in your Supabase dashboard",
+            "💡 Solution: Run the CREATE_ORDERS_TABLE.sql script in your Supabase dashboard",
           );
         }
 
