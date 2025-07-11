@@ -147,6 +147,27 @@ const Debug = () => {
 
           <Card>
             <CardHeader>
+              <CardTitle>Database Tables Check</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button
+                onClick={checkTables}
+                disabled={loading}
+                className="w-full"
+              >
+                {loading ? "Checking..." : "Check Tables"}
+              </Button>
+
+              {tableInfo && (
+                <div className="bg-gray-100 p-4 rounded text-sm">
+                  <pre>{JSON.stringify(tableInfo, null, 2)}</pre>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Order Creation Test</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
