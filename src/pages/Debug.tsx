@@ -150,13 +150,23 @@ const Debug = () => {
               <CardTitle>Database Tables Check</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button
-                onClick={checkTables}
-                disabled={loading}
-                className="w-full"
-              >
-                {loading ? "Checking..." : "Check Tables"}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={checkTables}
+                  disabled={loading}
+                  className="flex-1"
+                >
+                  {loading ? "Checking..." : "Check Tables"}
+                </Button>
+                <Button
+                  onClick={() => ordersService.createOrdersTable()}
+                  disabled={loading}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Show Table SQL
+                </Button>
+              </div>
 
               {tableInfo && (
                 <div className="bg-gray-100 p-4 rounded text-sm">
