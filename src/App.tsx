@@ -24,6 +24,7 @@ import AdminOffers from "./pages/AdminOffers";
 import AdminCoupons from "./pages/AdminCoupons";
 import AdminMessages from "./pages/AdminMessages";
 import AdminSettings from "./pages/AdminSettings";
+import Debug from "./pages/Debug";
 
 const queryClient = new QueryClient();
 
