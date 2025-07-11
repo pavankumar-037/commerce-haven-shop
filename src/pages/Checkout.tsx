@@ -1,64 +1,79 @@
-
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Truck, MapPin, User, Phone, Mail, Tag, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useCart } from '@/hooks/useCart';
-import { useCoupons } from '@/hooks/useCoupons';
-import { toast } from '@/hooks/use-toast';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  CreditCard,
+  Truck,
+  MapPin,
+  User,
+  Phone,
+  Mail,
+  Tag,
+  X,
+  Smartphone,
+  Building,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useCart } from "@/hooks/useCart";
+import { useCoupons } from "@/hooks/useCoupons";
+import { toast } from "@/hooks/use-toast";
+import { ordersService, type OrderData } from "@/integrations/supabase/orders";
+import { PaymentGateway } from "@/services/paymentGateway";
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { cartItems, getCartTotal, clearCart } = useCart();
   const { appliedCoupon, applyCoupon, removeCoupon, useCoupon } = useCoupons();
-  
-  const [couponCode, setCouponCode] = useState('');
-  const [couponError, setCouponError] = useState('');
+
+  const [couponCode, setCouponCode] = useState("");
+  const [couponError, setCouponError] = useState("");
   const [formData, setFormData] = useState({
-    email: '',
-    firstName: '',
-    lastName: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    phone: '',
-    paymentMethod: 'cod'
+    email: "",
+    firstName: "",
+    lastName: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    phone: "",
+    paymentMethod: "cod",
   });
 
   const subtotal = getCartTotal();
-  const couponDiscount = appliedCoupon ? applyCoupon(appliedCoupon.code, subtotal).discount : 0;
-  const shippingCost = (subtotal - couponDiscount) > 999 ? 0 : 50;
+  const couponDiscount = appliedCoupon
+    ? applyCoupon(appliedCoupon.code, subtotal).discount
+    : 0;
+  const shippingCost = subtotal - couponDiscount > 999 ? 0 : 50;
   const total = subtotal - couponDiscount + shippingCost;
 
   useEffect(() => {
     if (cartItems.length === 0) {
-      navigate('/cart');
+      navigate("/cart");
     }
   }, [cartItems, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleApplyCoupon = () => {
     if (!couponCode.trim()) {
-      setCouponError('Please enter a coupon code');
+      setCouponError("Please enter a coupon code");
       return;
     }
 
     const result = applyCoupon(couponCode.trim(), subtotal);
     if (result.isValid) {
       toast({ title: result.message });
-      setCouponCode('');
-      setCouponError('');
+      setCouponCode("");
+      setCouponError("");
     } else {
       setCouponError(result.message);
     }
@@ -71,14 +86,21 @@ const Checkout = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Basic validation
-    if (!formData.email || !formData.firstName || !formData.lastName || 
-        !formData.address || !formData.city || !formData.state || 
-        !formData.zipCode || !formData.phone) {
+    if (
+      !formData.email ||
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.address ||
+      !formData.city ||
+      !formData.state ||
+      !formData.zipCode ||
+      !formData.phone
+    ) {
       toast({
         title: "Please fill in all required fields",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -93,14 +115,14 @@ const Checkout = () => {
       shippingCost: Number(shippingCost.toFixed(2)),
       total: Number(total.toFixed(2)),
       appliedCoupon: appliedCoupon,
-      status: 'pending',
+      status: "pending",
       createdAt: new Date().toISOString(),
-      paymentMethod: formData.paymentMethod
+      paymentMethod: formData.paymentMethod,
     };
 
     // Save order to localStorage
-    const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-    localStorage.setItem('orders', JSON.stringify([...existingOrders, order]));
+    const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+    localStorage.setItem("orders", JSON.stringify([...existingOrders, order]));
 
     // Use coupon if applied
     if (appliedCoupon) {
@@ -112,18 +134,18 @@ const Checkout = () => {
 
     toast({
       title: "Order placed successfully!",
-      description: "You will receive a confirmation email shortly."
+      description: "You will receive a confirmation email shortly.",
     });
 
     // Navigate to success page
-    navigate('/order-success', { state: { order } });
+    navigate("/order-success", { state: { order } });
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <button
-          onClick={() => navigate('/cart')}
+          onClick={() => navigate("/cart")}
           className="inline-flex items-center text-primary hover:text-primary/80 mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -272,18 +294,26 @@ const Checkout = () => {
               <CardContent>
                 <RadioGroup
                   value={formData.paymentMethod}
-                  onValueChange={(value) => setFormData({...formData, paymentMethod: value})}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, paymentMethod: value })
+                  }
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="cod" id="cod" />
-                    <Label htmlFor="cod" className="flex items-center cursor-pointer">
+                    <Label
+                      htmlFor="cod"
+                      className="flex items-center cursor-pointer"
+                    >
                       <Truck className="w-4 h-4 mr-2" />
                       Cash on Delivery (COD)
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card" className="flex items-center cursor-pointer">
+                    <Label
+                      htmlFor="card"
+                      className="flex items-center cursor-pointer"
+                    >
                       <CreditCard className="w-4 h-4 mr-2" />
                       Credit/Debit Card
                     </Label>
@@ -300,18 +330,22 @@ const Checkout = () => {
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {cartItems.map(item => (
+                {cartItems.map((item) => (
                   <div key={item.id} className="flex items-center space-x-4">
-                    <img 
-                      src={item.image} 
+                    <img
+                      src={item.image}
                       alt={item.name}
                       className="w-16 h-16 object-cover rounded-md"
                     />
                     <div className="flex-1">
                       <h4 className="font-semibold text-sm">{item.name}</h4>
-                      <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                      <p className="text-sm text-gray-600">
+                        Qty: {item.quantity}
+                      </p>
                     </div>
-                    <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-semibold">
+                      ₹{(item.price * item.quantity).toFixed(2)}
+                    </p>
                   </div>
                 ))}
               </CardContent>
@@ -334,11 +368,11 @@ const Checkout = () => {
                         value={couponCode}
                         onChange={(e) => {
                           setCouponCode(e.target.value.toUpperCase());
-                          setCouponError('');
+                          setCouponError("");
                         }}
-                        className={couponError ? 'border-red-500' : ''}
+                        className={couponError ? "border-red-500" : ""}
                       />
-                      <Button 
+                      <Button
                         onClick={handleApplyCoupon}
                         variant="outline"
                         className="bg-green-50 hover:bg-green-100 border-green-300"
@@ -356,7 +390,9 @@ const Checkout = () => {
                       <p className="font-semibold text-green-800">
                         Coupon "{appliedCoupon.code}" Applied!
                       </p>
-                      <p className="text-sm text-green-600">{appliedCoupon.description}</p>
+                      <p className="text-sm text-green-600">
+                        {appliedCoupon.description}
+                      </p>
                     </div>
                     <Button
                       variant="ghost"
@@ -386,8 +422,10 @@ const Checkout = () => {
                   )}
                   <div className="flex justify-between">
                     <span>Shipping:</span>
-                    <span className={shippingCost === 0 ? 'text-green-600' : ''}>
-                      {shippingCost === 0 ? 'FREE' : `₹${shippingCost}`}
+                    <span
+                      className={shippingCost === 0 ? "text-green-600" : ""}
+                    >
+                      {shippingCost === 0 ? "FREE" : `₹${shippingCost}`}
                     </span>
                   </div>
                   <div className="flex justify-between text-xl font-bold border-t pt-3">
@@ -396,9 +434,9 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <Button 
+                <Button
                   onClick={handleSubmit}
-                  size="lg" 
+                  size="lg"
                   className="w-full mt-6 bg-orange-500 hover:bg-orange-600"
                 >
                   Place Order
