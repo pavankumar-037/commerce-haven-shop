@@ -181,7 +181,7 @@ const AdminThemeSettings = ({ onThemeUpdate }: Props) => {
     onThemeUpdate?.(defaultTheme);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Card className="border-stone-200">
         <CardHeader>
