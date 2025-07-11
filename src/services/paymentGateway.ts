@@ -55,6 +55,13 @@ export class PaymentGateway {
     });
   }
 
+  static async loadStripe(): Promise<Stripe | null> {
+    if (!this.stripePromise) {
+      this.stripePromise = loadStripe(this.STRIPE_PUBLIC_KEY);
+    }
+    return this.stripePromise;
+  }
+
   static async initiatePayment(options: PaymentOptions): Promise<void> {
     const isLoaded = await this.loadRazorpayScript();
 
