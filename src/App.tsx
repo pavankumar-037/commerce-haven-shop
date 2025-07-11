@@ -1,9 +1,9 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "@/hooks/useTheme";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProductDetail from "./pages/ProductDetail";
@@ -43,19 +43,22 @@ const App = () => (
           <Route path="/orders" element={<Orders />} />
           <Route path="/track-order" element={<OrderTracking />} />
           <Route path="/contact" element={<ContactUs />} />
-          
+
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/products" element={<AdminProducts />} />
           <Route path="/admin/sections" element={<AdminSections />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
-          <Route path="/admin/offers-manager" element={<AdminOffersManager />} />
+          <Route
+            path="/admin/offers-manager"
+            element={<AdminOffersManager />}
+          />
           <Route path="/admin/offers" element={<AdminOffers />} />
           <Route path="/admin/coupons" element={<AdminCoupons />} />
           <Route path="/admin/messages" element={<AdminMessages />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
-          
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
