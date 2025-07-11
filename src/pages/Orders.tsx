@@ -193,7 +193,7 @@ const Orders = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link
           to="/"
           className="inline-flex items-center text-primary hover:text-primary/80 mb-6"
@@ -202,9 +202,63 @@ const Orders = () => {
           Back to Home
         </Link>
 
-        <h1 className="text-3xl font-bold mb-8">Order History</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Order Tracking</h1>
+          <Button
+            onClick={loadAllOrders}
+            disabled={loading}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
 
-        {mockOrders.length === 0 ? (
+        {/* Search Section */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Search className="w-5 h-5 mr-2" />
+              Track Your Orders
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <Input
+                  placeholder="Enter your email address to track orders..."
+                  value={emailFilter}
+                  onChange={(e) => setEmailFilter(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={searchOrdersByEmail}
+                  disabled={loading}
+                  className="bg-orange-500 hover:bg-orange-600"
+                >
+                  Search Orders
+                </Button>
+                <Button
+                  onClick={loadAllOrders}
+                  disabled={loading}
+                  variant="outline"
+                >
+                  Show All
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            <span className="ml-2">Loading orders...</span>
+          </div>
+        ) : orders.length === 0 ? (
           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
             <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">No orders yet</h2>
