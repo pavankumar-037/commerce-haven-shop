@@ -630,8 +630,9 @@ const Checkout = () => {
                   onClick={handleSubmit}
                   size="lg"
                   className="w-full mt-6 bg-orange-500 hover:bg-orange-600"
+                  disabled={isProcessing}
                 >
-                  Place Order
+                  {isProcessing ? "Processing..." : "Place Order"}
                 </Button>
               </CardContent>
             </Card>
