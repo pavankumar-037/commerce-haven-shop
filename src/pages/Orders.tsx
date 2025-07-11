@@ -41,14 +41,151 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [searchEmail, setSearchEmail] = useState("");
   const [emailFilter, setEmailFilter] = useState("");
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Delivered":
+  useEffect(() => {
+    loadAllOrders();
+  }, []);
+
+  const transformOrder = (order: Order): OrderDisplay => {
+    const customerInfo = order.customer_info as any;
+    const items = order.items as any[];
+
+    return {
+      id: order.id,
+      date: order.created_at,
+      status: order.order_status,
+      total: order.total,
+      items: items,
+      customerEmail: customerInfo.email,
+      paymentMethod: order.payment_method,
+      paymentStatus: order.payment_status,
+    };
+  };
+
+  const loadAllOrders = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await ordersService.getOrders();
+
+      if (error) {
+        console.error("Error loading orders:", error);
+        toast({
+          title: "Error loading orders",
+          description: "Failed to fetch orders",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data) {
+        const transformedOrders = data.map(transformOrder);
+        setOrders(transformedOrders);
+      }
+    } catch (error) {
+      console.error("Error loading orders:", error);
+      toast({
+        title: "Error loading orders",
+        description: "Failed to fetch orders",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const searchOrdersByEmail = async () => {
+    if (!emailFilter.trim()) {
+      toast({
+        title: "Email required",
+        description: "Please enter an email address to search orders",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { data, error } = await ordersService.getOrdersByEmail(
+        emailFilter.trim(),
+      );
+
+      if (error) {
+        console.error("Error searching orders:", error);
+        toast({
+          title: "Error searching orders",
+          description: "Failed to search orders by email",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data) {
+        const transformedOrders = data.map(transformOrder);
+        setOrders(transformedOrders);
+        if (transformedOrders.length === 0) {
+          toast({
+            title: "No orders found",
+            description: `No orders found for email: ${emailFilter}`,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error searching orders:", error);
+      toast({
+        title: "Error searching orders",
+        description: "Failed to search orders by email",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "delivered":
         return "bg-green-100 text-green-800";
-      case "Shipped":
+      case "shipped":
         return "bg-blue-100 text-blue-800";
-      case "Processing":
+      case "confirmed":
+        return "bg-blue-100 text-blue-800";
+      case "processing":
         return "bg-yellow-100 text-yellow-800";
+      case "pending":
+        return "bg-orange-100 text-orange-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "delivered":
+        return CheckCircle;
+      case "shipped":
+        return Truck;
+      case "confirmed":
+        return CheckCircle;
+      case "processing":
+        return Package;
+      case "pending":
+        return Clock;
+      case "cancelled":
+        return AlertCircle;
+      default:
+        return Clock;
+    }
+  };
+
+  const getPaymentStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "failed":
+        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
