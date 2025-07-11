@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingCart, User, Star, Filter, Gift, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ShoppingCart, User, Star, Filter, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/hooks/useCart';
 import ComboOffers from '@/components/ComboOffers';
+import HeroCarousel from '@/components/HeroCarousel';
 
 const Index = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showComboOffers, setShowComboOffers] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [siteSettings, setSiteSettings] = useState(null);
   const { addToCart, getCartItemsCount } = useCart();
 
@@ -38,14 +38,6 @@ const Index = () => {
   ];
 
   const [heroSlides, setHeroSlides] = useState(defaultHeroSlides);
-
-  useEffect(() => {
-    const slideInterval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
-
-    return () => clearInterval(slideInterval);
-  }, [heroSlides.length]);
 
   useEffect(() => {
     // Load site settings
@@ -295,6 +287,13 @@ const Index = () => {
   const secondaryColor = siteSettings?.appearance?.secondaryColor || '#78716c';
   const accentColor = siteSettings?.appearance?.accentColor || '#ea580c';
 
+  const handleScrollToProducts = () => {
+    const element = document.getElementById('products-section');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 via-neutral-50 to-slate-50">
       {/* Custom CSS for dynamic colors */}
@@ -382,89 +381,13 @@ const Index = () => {
       </header>
 
       {/* Hero Carousel with Admin-Controlled Slides */}
-      <div className="relative overflow-hidden">
-        <div 
-          className="flex transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-        >
-          {heroSlides.map((slide, index) => (
-            <div 
-              key={index}
-              className={`min-w-full bg-gradient-to-br ${slide.bgGradient} relative flex-shrink-0`}
-            >
-              <div className={`absolute inset-0 ${slide.overlayGradient}`} />
-              <div className="relative z-10 max-w-7xl mx-auto px-4 py-24 text-center">
-                <div className="backdrop-blur-sm bg-white/20 rounded-3xl p-12 border border-white/30 shadow-2xl">
-                  {siteSettings?.appearance?.heroThumbnail && (
-                    <img 
-                      src={siteSettings.appearance.heroThumbnail} 
-                      alt="Hero" 
-                      className="w-32 h-32 object-cover rounded-full mx-auto mb-6 border-4 border-white/50 shadow-lg"
-                    />
-                  )}
-                  <h1 className="text-6xl font-bold mb-4 text-stone-800 animate-fade-in">
-                    {slide.title}
-                  </h1>
-                  <p className="text-xl mb-8 text-stone-700 animate-fade-in">
-                    {slide.subtitle}
-                  </p>
-                  <div className="flex justify-center space-x-4">
-                    <Button 
-                      size="lg" 
-                      className="text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all"
-                      style={{ 
-                        backgroundColor: primaryColor,
-                        '--tw-shadow-color': `${primaryColor}44`
-                      }}
-                    >
-                      Shop Now
-                    </Button>
-                    <Button 
-                      size="lg" 
-                      variant="outline"
-                      className="border-stone-400 text-stone-700 hover:bg-stone-100 font-semibold px-8 py-3 rounded-full"
-                      onClick={handleTrendingClick}
-                    >
-                      Trending
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Carousel Controls */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-stone-700 rounded-full backdrop-blur-sm"
-          onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-stone-700 rounded-full backdrop-blur-sm"
-          onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-        >
-          <ChevronRight className="w-6 h-6" />
-        </Button>
-        
-        {/* Slide Indicators */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              className={`w-3 h-3 rounded-full transition-all ${
-                index === currentSlide ? 'bg-white' : 'bg-white/50'
-              }`}
-              onClick={() => setCurrentSlide(index)}
-            />
-          ))}
-        </div>
-      </div>
+      <HeroCarousel
+        slides={heroSlides}
+        heroThumbnail={siteSettings?.appearance?.heroThumbnail}
+        primaryColor={primaryColor}
+        onShopNow={handleScrollToProducts}
+        onTrendingClick={handleTrendingClick}
+      />
 
       {/* Collections Preview Section */}
       <div id="trending" className="py-16 bg-gradient-to-br from-amber-50/50 via-orange-50/30 to-yellow-50/50">

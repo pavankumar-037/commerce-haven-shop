@@ -7,9 +7,7 @@ import {
   ShoppingBag, 
   Bell, 
   Search as SearchIcon,
-  Settings as SettingsIcon,
   Upload,
-  Image as ImageIcon,
   Plus,
   Trash2
 } from 'lucide-react';
@@ -21,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import AdminSidebar from '@/components/AdminSidebar';
+import AdminAppearanceSettings from '@/components/AdminAppearanceSettings';
 import { useToast } from '@/hooks/use-toast';
 
 interface CarouselSlide {
@@ -162,6 +161,16 @@ const AdminSettings = () => {
     }));
   };
 
+  const handleAppearanceUpdate = (field: string, value: any) => {
+    setSettings(prev => ({
+      ...prev,
+      appearance: {
+        ...prev.appearance,
+        [field]: value
+      }
+    }));
+  };
+
   const handleSlideChange = (slideId: number, field: string, value: string) => {
     setSettings(prev => ({
       ...prev,
@@ -215,13 +224,7 @@ const AdminSettings = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setSettings(prev => ({
-          ...prev,
-          appearance: {
-            ...prev.appearance,
-            heroThumbnail: reader.result as string
-          }
-        }));
+        handleAppearanceUpdate('heroThumbnail', reader.result as string);
       };
       reader.readAsDataURL(file);
     }
