@@ -36,12 +36,21 @@ export const ordersService = {
     try {
       const { error } = await supabase.from("orders").select("count").limit(0);
       if (error) {
-        console.error("Supabase connection test failed:", error);
+        console.error("Supabase connection test failed:", {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint,
+          fullError: error,
+        });
         return false;
       }
       return true;
     } catch (error) {
-      console.error("Supabase connection test exception:", error);
+      console.error("Supabase connection test exception:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        error: error,
+      });
       return false;
     }
   },
