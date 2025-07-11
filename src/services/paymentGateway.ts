@@ -188,6 +188,80 @@ export class PaymentGateway {
     });
   }
 
+  // Modern Stripe payment processing
+  static async processStripePayment(options: PaymentOptions): Promise<any> {
+    try {
+      const stripe = await this.loadStripe();
+      if (!stripe) {
+        throw new Error("Failed to load Stripe");
+      }
+
+      // In a real implementation, you would create a payment intent on your backend
+      // For demo purposes, we'll simulate the payment
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: `demo_session_${Date.now()}`, // In real app, get this from your backend
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return {
+        paymentId: `stripe_${Date.now()}`,
+        orderId: options.orderId,
+        method: "stripe",
+        status: "completed",
+      };
+    } catch (error) {
+      throw new Error(`Stripe payment failed: ${error}`);
+    }
+  }
+
+  // Simulate modern UPI payment (PhonePe, Google Pay, Paytm style)
+  static simulateModernUPIPayment(options: PaymentOptions): Promise<any> {
+    return new Promise((resolve, reject) => {
+      // Simulate UPI app redirect and processing
+      setTimeout(() => {
+        if (Math.random() > 0.05) {
+          // 95% success rate
+          resolve({
+            paymentId: `upi_${Date.now()}`,
+            orderId: options.orderId,
+            method: "upi",
+            status: "completed",
+            transactionId: `UPI${Date.now()}`,
+            upiId: "user@paytm",
+          });
+        } else {
+          reject(new Error("UPI payment failed or cancelled by user"));
+        }
+      }, 2000);
+    });
+  }
+
+  // Simulate modern card payment with better security
+  static simulateSecureCardPayment(options: PaymentOptions): Promise<any> {
+    return new Promise((resolve, reject) => {
+      // Simulate 3D Secure and tokenization
+      setTimeout(() => {
+        if (Math.random() > 0.02) {
+          // 98% success rate for cards
+          resolve({
+            paymentId: `card_${Date.now()}`,
+            orderId: options.orderId,
+            method: "card",
+            status: "completed",
+            cardLast4: "1234",
+            cardType: "VISA",
+            authCode: `AUTH${Date.now()}`,
+          });
+        } else {
+          reject(new Error("Card payment declined by bank"));
+        }
+      }, 3000);
+    });
+  }
+
   // Cash on Delivery - immediate success
   static processCODPayment(orderId: string): Promise<any> {
     return Promise.resolve({
