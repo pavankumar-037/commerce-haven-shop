@@ -344,40 +344,42 @@ const OrderTracking = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {getTrackingSteps(order.status).map((step, index) => (
-                    <div
-                      key={step.status}
-                      className="flex items-start space-x-4"
-                    >
+                  {getTrackingSteps(getOrderStatus(order)).map(
+                    (step, index) => (
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          step.isCompleted
-                            ? "bg-green-500 text-white"
-                            : step.isCurrent
-                              ? "bg-blue-500 text-white"
-                              : "bg-gray-300"
-                        }`}
+                        key={step.status}
+                        className="flex items-start space-x-4"
                       >
-                        {step.isCompleted ? (
-                          <CheckCircle className="w-4 h-4" />
-                        ) : (
-                          <span className="text-sm font-semibold">
-                            {index + 1}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h4
-                          className={`font-semibold ${step.isCurrent ? "text-blue-600" : ""}`}
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            step.isCompleted
+                              ? "bg-green-500 text-white"
+                              : step.isCurrent
+                                ? "bg-blue-500 text-white"
+                                : "bg-gray-300"
+                          }`}
                         >
-                          {step.label}
-                        </h4>
-                        <p className="text-sm text-gray-600">
-                          {step.description}
-                        </p>
+                          {step.isCompleted ? (
+                            <CheckCircle className="w-4 h-4" />
+                          ) : (
+                            <span className="text-sm font-semibold">
+                              {index + 1}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <h4
+                            className={`font-semibold ${step.isCurrent ? "text-blue-600" : ""}`}
+                          >
+                            {step.label}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {step.description}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>
