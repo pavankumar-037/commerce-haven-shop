@@ -57,9 +57,11 @@ interface OrderDisplay {
 const AdminOrders = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderDisplay[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     // Check admin authentication
@@ -69,44 +71,70 @@ const AdminOrders = () => {
       return;
     }
 
-    // Load orders from localStorage
-    const savedOrders = localStorage.getItem("orders");
-    if (savedOrders) {
-      setOrders(JSON.parse(savedOrders));
-    } else {
-      // Initialize with sample orders
-      const sampleOrders: Order[] = [
-        {
-          id: "ORD-001",
-          customerName: "Rajesh Kumar",
-          email: "rajesh@example.com",
-          phone: "+91 98765 43210",
-          total: 4999,
-          status: "pending",
-          items: [
-            {
-              id: 1,
-              name: "Cream Silk Kurta Pajama Set",
-              price: 2299,
-              quantity: 1,
-              image:
-                "/lovable-uploads/c2e7033c-24d2-4791-8ec2-f68e1ea2b10d.png",
-            },
-          ],
-          shippingAddress: {
-            street: "123 MG Road",
-            city: "Mumbai",
-            state: "Maharashtra",
-            zipCode: "400001",
-          },
-          paymentMethod: "UPI",
-          orderDate: new Date().toISOString(),
-        },
-      ];
-      setOrders(sampleOrders);
-      localStorage.setItem("orders", JSON.stringify(sampleOrders));
-    }
+    loadOrders();
   }, [navigate]);
+
+  const transformSupabaseOrder = (
+    supabaseOrder: SupabaseOrder,
+  ): OrderDisplay => {
+    const customerInfo = supabaseOrder.customer_info as any;
+    const items = supabaseOrder.items as any[];
+
+    return {
+      id: supabaseOrder.id,
+      customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
+      email: customerInfo.email,
+      phone: customerInfo.phone,
+      total: supabaseOrder.total,
+      status: supabaseOrder.order_status,
+      items: items,
+      shippingAddress: {
+        street: customerInfo.address,
+        city: customerInfo.city,
+        state: customerInfo.state,
+        zipCode: customerInfo.zipCode,
+      },
+      paymentMethod: supabaseOrder.payment_method,
+      orderDate: supabaseOrder.created_at,
+    };
+  };
+
+  const loadOrders = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await ordersService.getOrders();
+
+      if (error) {
+        console.error("Error loading orders:", error);
+        toast({
+          title: "Error loading orders",
+          description: "Failed to fetch orders from database",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data) {
+        const transformedOrders = data.map(transformSupabaseOrder);
+        setOrders(transformedOrders);
+      }
+    } catch (error) {
+      console.error("Error loading orders:", error);
+      toast({
+        title: "Error loading orders",
+        description: "Failed to fetch orders from database",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshOrders = async () => {
+    setRefreshing(true);
+    await loadOrders();
+    setRefreshing(false);
+  };
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
