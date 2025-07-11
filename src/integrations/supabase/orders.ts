@@ -32,6 +32,20 @@ export interface OrderData {
 }
 
 export const ordersService = {
+  async testConnection(): Promise<boolean> {
+    try {
+      const { error } = await supabase.from("orders").select("count").limit(0);
+      if (error) {
+        console.error("Supabase connection test failed:", error);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Supabase connection test exception:", error);
+      return false;
+    }
+  },
+
   async createOrder(
     orderData: OrderData,
   ): Promise<{ data: Order | null; error: Error | null }> {
