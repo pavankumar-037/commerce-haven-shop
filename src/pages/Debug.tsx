@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ordersService } from "@/integrations/supabase/orders";
 import { toast } from "@/hooks/use-toast";
+import { listTables } from "@/utils/testSupabase";
 
 const Debug = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
