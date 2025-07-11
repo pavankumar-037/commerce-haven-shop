@@ -119,7 +119,11 @@ export const ordersService = {
 
       return { data, error: null };
     } catch (error) {
-      console.error("Error creating order:", error);
+      console.error("Exception creating order:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+        error: error,
+      });
 
       // Fallback to localStorage if Supabase fails
       try {
