@@ -471,6 +471,16 @@ const Checkout = () => {
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="upi" id="upi" />
+                    <Label
+                      htmlFor="upi"
+                      className="flex items-center cursor-pointer"
+                    >
+                      <Smartphone className="w-4 h-4 mr-2" />
+                      UPI Payment
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
                     <RadioGroupItem value="card" id="card" />
                     <Label
                       htmlFor="card"
@@ -478,6 +488,26 @@ const Checkout = () => {
                     >
                       <CreditCard className="w-4 h-4 mr-2" />
                       Credit/Debit Card
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="netbanking" id="netbanking" />
+                    <Label
+                      htmlFor="netbanking"
+                      className="flex items-center cursor-pointer"
+                    >
+                      <Building className="w-4 h-4 mr-2" />
+                      Net Banking
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="razorpay" id="razorpay" />
+                    <Label
+                      htmlFor="razorpay"
+                      className="flex items-center cursor-pointer"
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Razorpay (All Methods)
                     </Label>
                   </div>
                 </RadioGroup>
