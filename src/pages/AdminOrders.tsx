@@ -289,9 +289,15 @@ const AdminOrders = () => {
           <CardHeader>
             <CardTitle>Orders ({filteredOrders.length})</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
+                    <CardContent>
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                <span className="ml-2">Loading orders...</span>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Order ID</TableHead>
