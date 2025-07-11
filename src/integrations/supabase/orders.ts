@@ -68,11 +68,15 @@ export const ordersService = {
         order_status: "pending",
       };
 
+      console.log("Attempting to insert order into Supabase...");
+
       const { data, error } = await supabase
         .from("orders")
         .insert(orderInsert)
         .select()
         .single();
+
+      console.log("Supabase insert result:", { data, error });
 
       if (error) {
         console.error("Supabase error creating order:", {
