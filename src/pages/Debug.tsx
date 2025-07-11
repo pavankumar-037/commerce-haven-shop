@@ -9,6 +9,7 @@ const Debug = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [testResult, setTestResult] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [tableInfo, setTableInfo] = useState<any>(null);
 
   const testConnection = async () => {
     setLoading(true);
