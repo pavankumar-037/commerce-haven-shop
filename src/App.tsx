@@ -40,7 +40,14 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
+            <Route
+              path="/checkout"
+              element={
+                <ErrorBoundary>
+                  <Checkout />
+                </ErrorBoundary>
+              }
+            />
             <Route path="/auth" element={<Auth />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/orders" element={<Orders />} />
