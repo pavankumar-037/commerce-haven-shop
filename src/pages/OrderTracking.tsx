@@ -160,7 +160,7 @@ const OrderTracking = () => {
     }
   };
 
-  const getStatusIcon = (status: Order["status"]) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
         return Clock;
