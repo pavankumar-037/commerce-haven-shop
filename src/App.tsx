@@ -37,42 +37,46 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<Cart />} />
-                        <Route path="/checkout" element={
-              <ErrorBoundary>
-                <Checkout />
-              </ErrorBoundary>
-            } />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/order-success" element={<OrderSuccess />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/track-order" element={<OrderTracking />} />
-            <Route path="/contact" element={<ContactUs />} />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route
+                path="/checkout"
+                element={
+                  <ErrorBoundary>
+                    <Checkout />
+                  </ErrorBoundary>
+                }
+              />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/order-success" element={<OrderSuccess />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/track-order" element={<OrderTracking />} />
+              <Route path="/contact" element={<ContactUs />} />
 
-            {/* Admin Routes */}
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/products" element={<AdminProducts />} />
-            <Route path="/admin/sections" element={<AdminSections />} />
-            <Route path="/admin/orders" element={<AdminOrders />} />
-            <Route
-              path="/admin/offers-manager"
-              element={<AdminOffersManager />}
-            />
-            <Route path="/admin/offers" element={<AdminOffers />} />
-            <Route path="/admin/coupons" element={<AdminCoupons />} />
-            <Route path="/admin/messages" element={<AdminMessages />} />
-                        <Route path="/admin/settings" element={<AdminSettings />} />
+              {/* Admin Routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/products" element={<AdminProducts />} />
+              <Route path="/admin/sections" element={<AdminSections />} />
+              <Route path="/admin/orders" element={<AdminOrders />} />
+              <Route
+                path="/admin/offers-manager"
+                element={<AdminOffersManager />}
+              />
+              <Route path="/admin/offers" element={<AdminOffers />} />
+              <Route path="/admin/coupons" element={<AdminCoupons />} />
+              <Route path="/admin/messages" element={<AdminMessages />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
 
-            {/* Debug route for development */}
-            <Route path="/debug" element={<Debug />} />
+              {/* Debug route for development */}
+              <Route path="/debug" element={<Debug />} />
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </ErrorBoundary>
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>
