@@ -12,7 +12,30 @@ export const testSupabaseConnection = async () => {
       .limit(0);
 
     if (connectionError) {
-      console.error("Connection test failed:", connectionError);
+      console.error("Connection test failed:", {
+        message: connectionError.message,
+        code: connectionError.code,
+        details: connectionError.details,
+        hint: connectionError.hint,
+        fullError: connectionError,
+      });
+
+      // Check if it's a table not found error
+      if (
+        connectionError.code === "PGRST106" ||
+        connectionError.message.includes("does not exist")
+      ) {
+        console.error(
+          "❌ ORDERS TABLE DOES NOT EXIST - This is the root cause!",
+        );
+        return {
+          success: false,
+          error: new Error(
+            "Orders table does not exist in Supabase. Please run the migration.",
+          ),
+        };
+      }
+
       return { success: false, error: connectionError };
     }
 
