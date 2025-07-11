@@ -177,7 +177,7 @@ const AdminThemeSettings = ({ onThemeUpdate }: Props) => {
     };
 
     setThemeSettings(defaultTheme);
-    applyThemeToDOM(defaultTheme);
+    updateTheme(defaultTheme);
     onThemeUpdate?.(defaultTheme);
   };
 
