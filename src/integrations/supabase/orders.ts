@@ -33,51 +33,36 @@ export interface OrderData {
 
 export const ordersService = {
   async createOrdersTable(): Promise<{ success: boolean; error?: string }> {
-    try {
-      console.log("Creating orders table...");
+    console.log(
+      "❌ Cannot create table from frontend code for security reasons",
+    );
+    console.log("💡 Please run the SQL script manually in Supabase dashboard:");
+    console.log(`
+CREATE TABLE IF NOT EXISTS public.orders (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_email text NOT NULL,
+  customer_info jsonb NOT NULL,
+  items jsonb NOT NULL,
+  subtotal decimal(10,2) NOT NULL,
+  coupon_discount decimal(10,2) DEFAULT 0,
+  shipping_cost decimal(10,2) DEFAULT 0,
+  total decimal(10,2) NOT NULL,
+  applied_coupon jsonb,
+  payment_method text NOT NULL,
+  payment_status text DEFAULT 'pending',
+  order_status text DEFAULT 'pending',
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now()
+);
 
-      // Create the orders table
-      const { error } = await supabase.rpc("sql", {
-        query: `
-        CREATE TABLE IF NOT EXISTS public.orders (
-          id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-          user_email text NOT NULL,
-          customer_info jsonb NOT NULL,
-          items jsonb NOT NULL,
-          subtotal decimal(10,2) NOT NULL,
-          coupon_discount decimal(10,2) DEFAULT 0,
-          shipping_cost decimal(10,2) DEFAULT 0,
-          total decimal(10,2) NOT NULL,
-          applied_coupon jsonb,
-          payment_method text NOT NULL,
-          payment_status text DEFAULT 'pending',
-          order_status text DEFAULT 'pending',
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp with time zone DEFAULT now()
-        );
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all operations" ON public.orders FOR ALL USING (true);
+    `);
 
-        ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
-
-        CREATE POLICY IF NOT EXISTS "Allow all operations on orders"
-        ON public.orders FOR ALL USING (true) WITH CHECK (true);
-        `,
-      });
-
-      if (error) {
-        console.error(
-          "Failed to create orders table:",
-          JSON.stringify(error, null, 2),
-        );
-        return { success: false, error: error.message };
-      }
-
-      console.log("✅ Orders table created successfully");
-      return { success: true };
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      console.error("Exception creating orders table:", errorMsg);
-      return { success: false, error: errorMsg };
-    }
+    return {
+      success: false,
+      error: "Table creation must be done manually in Supabase dashboard",
+    };
   },
 
   async testConnection(): Promise<boolean> {
