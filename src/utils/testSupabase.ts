@@ -1,5 +1,46 @@
 import { supabase } from "@/integrations/supabase/client";
 
+export const listTables = async () => {
+  console.log("Checking available tables...");
+
+  try {
+    // Test with known tables first
+    const knownTables = ["offers", "theme_settings"];
+    const results = [];
+
+    for (const table of knownTables) {
+      try {
+        const { error } = await supabase.from(table).select("count").limit(0);
+        results.push({ table, exists: !error, error: error?.message });
+      } catch (e) {
+        results.push({
+          table,
+          exists: false,
+          error: e instanceof Error ? e.message : "Unknown error",
+        });
+      }
+    }
+
+    // Test orders table specifically
+    try {
+      const { error } = await supabase.from("orders").select("count").limit(0);
+      results.push({ table: "orders", exists: !error, error: error?.message });
+    } catch (e) {
+      results.push({
+        table: "orders",
+        exists: false,
+        error: e instanceof Error ? e.message : "Unknown error",
+      });
+    }
+
+    console.log("Table check results:", results);
+    return { success: true, tables: results };
+  } catch (error) {
+    console.error("Exception checking tables:", error);
+    return { success: false, error };
+  }
+};
+
 export const testSupabaseConnection = async () => {
   console.log("Testing Supabase connection...");
 
