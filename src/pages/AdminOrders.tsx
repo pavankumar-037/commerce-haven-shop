@@ -30,13 +30,13 @@ import {
   type Order as SupabaseOrder,
 } from "@/integrations/supabase/orders";
 
-interface Order {
+interface OrderDisplay {
   id: string;
   customerName: string;
   email: string;
   phone: string;
   total: number;
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  status: string;
   items: Array<{
     id: number;
     name: string;
