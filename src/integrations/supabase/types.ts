@@ -53,6 +53,48 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          created_at: string
+          id: string
+          items: Json
+          order_number: string
+          order_status: string
+          payment_method: string
+          payment_status: string
+          stripe_session_id: string | null
+          total_amount: number
+          updated_at: string
+          user_email: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          items: Json
+          order_number: string
+          order_status?: string
+          payment_method: string
+          payment_status?: string
+          stripe_session_id?: string | null
+          total_amount: number
+          updated_at?: string
+          user_email: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          items?: Json
+          order_number?: string
+          order_status?: string
+          payment_method?: string
+          payment_status?: string
+          stripe_session_id?: string | null
+          total_amount?: number
+          updated_at?: string
+          user_email?: string
+        }
+        Relationships: []
+      }
       theme_settings: {
         Row: {
           accent_color: string | null
@@ -88,7 +130,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_order_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

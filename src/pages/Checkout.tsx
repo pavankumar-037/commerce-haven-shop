@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Truck, MapPin, User, Phone, Mail, Tag, X } from 'lucide-react';
+import { ArrowLeft, CreditCard, Truck, MapPin, User, Phone, Mail, Tag, X, Smartphone, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useCart } from '@/hooks/useCart';
 import { useCoupons } from '@/hooks/useCoupons';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Checkout = () => {
   
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -27,7 +29,7 @@ const Checkout = () => {
     state: '',
     zipCode: '',
     phone: '',
-    paymentMethod: 'cod'
+    paymentMethod: 'card'
   });
 
   const subtotal = getCartTotal();
@@ -69,7 +71,7 @@ const Checkout = () => {
     toast({ title: "Coupon removed" });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
@@ -83,40 +85,114 @@ const Checkout = () => {
       return;
     }
 
-    // Create order
-    const order = {
-      id: Date.now().toString(),
-      items: cartItems,
-      customerInfo: formData,
-      subtotal: Number(subtotal.toFixed(2)),
-      couponDiscount: Number(couponDiscount.toFixed(2)),
-      shippingCost: Number(shippingCost.toFixed(2)),
-      total: Number(total.toFixed(2)),
-      appliedCoupon: appliedCoupon,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-      paymentMethod: formData.paymentMethod
-    };
-
-    // Save order to localStorage
-    const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-    localStorage.setItem('orders', JSON.stringify([...existingOrders, order]));
-
-    // Use coupon if applied
-    if (appliedCoupon) {
-      useCoupon(appliedCoupon.id);
+    if (formData.paymentMethod === 'cod') {
+      // Handle COD orders directly
+      handleCODOrder();
+      return;
     }
 
-    // Clear cart
-    clearCart();
+    // Handle online payments
+    setIsProcessing(true);
 
-    toast({
-      title: "Order placed successfully!",
-      description: "You will receive a confirmation email shortly."
-    });
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: {
+          items: cartItems.map(item => ({
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image
+          })),
+          total: total,
+          userEmail: formData.email,
+          paymentMethod: getPaymentMethodName(formData.paymentMethod)
+        }
+      });
 
-    // Navigate to success page
-    navigate('/order-success', { state: { order } });
+      if (error) {
+        throw error;
+      }
+
+      if (data?.url) {
+        // Store form data in session storage for later use
+        sessionStorage.setItem('checkoutFormData', JSON.stringify(formData));
+        sessionStorage.setItem('appliedCoupon', JSON.stringify(appliedCoupon));
+        
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error('Payment session creation failed');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Payment failed",
+        description: "Please try again or contact support.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleCODOrder = async () => {
+    try {
+      // Create order directly in database for COD
+      const { data: order, error } = await supabase
+        .from('orders')
+        .insert({
+          user_email: formData.email,
+          items: cartItems.map(item => ({
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image
+          })),
+          total_amount: total,
+          payment_method: 'Cash on Delivery',
+          payment_status: 'pending',
+          order_status: 'confirmed'
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      // Use coupon if applied
+      if (appliedCoupon) {
+        useCoupon(appliedCoupon.id);
+      }
+
+      // Clear cart
+      clearCart();
+
+      toast({
+        title: "Order placed successfully!",
+        description: "You will receive a confirmation call shortly."
+      });
+
+      // Navigate to success page
+      navigate(`/order-success?order_id=${order.id}&cod=true`);
+    } catch (error) {
+      console.error('COD order error:', error);
+      toast({
+        title: "Order failed",
+        description: "Please try again or contact support.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getPaymentMethodName = (method: string) => {
+    switch (method) {
+      case 'card': return 'Credit/Debit Card';
+      case 'upi': return 'UPI';
+      case 'netbanking': return 'Net Banking';
+      case 'wallet': return 'Digital Wallet';
+      default: return 'Credit/Debit Card';
+    }
   };
 
   return (
@@ -275,17 +351,31 @@ const Checkout = () => {
                   onValueChange={(value) => setFormData({...formData, paymentMethod: value})}
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="cod" id="cod" />
-                    <Label htmlFor="cod" className="flex items-center cursor-pointer">
-                      <Truck className="w-4 h-4 mr-2" />
-                      Cash on Delivery (COD)
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
                     <RadioGroupItem value="card" id="card" />
                     <Label htmlFor="card" className="flex items-center cursor-pointer">
                       <CreditCard className="w-4 h-4 mr-2" />
                       Credit/Debit Card
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="upi" id="upi" />
+                    <Label htmlFor="upi" className="flex items-center cursor-pointer">
+                      <Smartphone className="w-4 h-4 mr-2" />
+                      UPI
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="netbanking" id="netbanking" />
+                    <Label htmlFor="netbanking" className="flex items-center cursor-pointer">
+                      <Building className="w-4 h-4 mr-2" />
+                      Net Banking
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="cod" id="cod" />
+                    <Label htmlFor="cod" className="flex items-center cursor-pointer">
+                      <Truck className="w-4 h-4 mr-2" />
+                      Cash on Delivery (COD)
                     </Label>
                   </div>
                 </RadioGroup>
@@ -398,10 +488,13 @@ const Checkout = () => {
 
                 <Button 
                   onClick={handleSubmit}
+                  disabled={isProcessing}
                   size="lg" 
-                  className="w-full mt-6 bg-orange-500 hover:bg-orange-600"
+                  className="w-full mt-6 bg-orange-500 hover:bg-orange-600 disabled:opacity-50"
                 >
-                  Place Order
+                  {isProcessing ? 'Processing...' : 
+                   formData.paymentMethod === 'cod' ? 'Place Order (COD)' : 
+                   'Proceed to Payment'}
                 </Button>
               </CardContent>
             </Card>
