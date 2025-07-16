@@ -125,6 +125,7 @@ const Checkout = () => {
         !formData.zipCode || !formData.phone) {
       toast({
         title: "Please fill in all required fields",
+        description: "Fill in all the required fields to proceed",
         variant: "destructive"
       });
       return;
@@ -140,6 +141,8 @@ const Checkout = () => {
     setIsProcessing(true);
 
     try {
+      console.log('Creating payment session...', { total, userEmail: formData.email });
+      
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
           items: cartItems.map(item => ({
@@ -154,7 +157,10 @@ const Checkout = () => {
         }
       });
 
+      console.log('Payment session response:', { data, error });
+
       if (error) {
+        console.error('Payment session error:', error);
         throw error;
       }
 
@@ -163,16 +169,18 @@ const Checkout = () => {
         sessionStorage.setItem('checkoutFormData', JSON.stringify(formData));
         sessionStorage.setItem('appliedCoupon', JSON.stringify(appliedCoupon));
         
+        console.log('Redirecting to Stripe checkout:', data.url);
         // Redirect to Stripe checkout
         window.location.href = data.url;
       } else {
-        throw new Error('Payment session creation failed');
+        console.error('No payment URL received:', data);
+        throw new Error('Payment session creation failed - no URL received');
       }
     } catch (error) {
       console.error('Payment error:', error);
       toast({
         title: "Payment failed",
-        description: "Please try again or contact support.",
+        description: error.message || "Please try again or contact support.",
         variant: "destructive"
       });
     } finally {
