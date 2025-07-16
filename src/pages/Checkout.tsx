@@ -17,6 +17,9 @@ const Checkout = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
   const { appliedCoupon, applyCoupon, removeCoupon, useCoupon } = useCoupons();
   
+  const [user, setUser] = useState<any>(null);
+  const [session, setSession] = useState<any>(null);
+  const [isAuthRequired, setIsAuthRequired] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -40,7 +43,43 @@ const Checkout = () => {
   useEffect(() => {
     if (cartItems.length === 0) {
       navigate('/cart');
+      return;
     }
+
+    // Check authentication status
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      setUser(session?.user || null);
+      
+      if (session?.user) {
+        setFormData(prev => ({
+          ...prev,
+          email: session.user.email || '',
+          firstName: session.user.user_metadata?.name?.split(' ')[0] || '',
+          lastName: session.user.user_metadata?.name?.split(' ').slice(1).join(' ') || ''
+        }));
+      }
+    };
+    
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user || null);
+      
+      if (session?.user) {
+        setFormData(prev => ({
+          ...prev,
+          email: session.user.email || '',
+          firstName: session.user.user_metadata?.name?.split(' ')[0] || '',
+          lastName: session.user.user_metadata?.name?.split(' ').slice(1).join(' ') || ''
+        }));
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [cartItems, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,6 +112,12 @@ const Checkout = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check if user is authenticated for online payments
+    if (formData.paymentMethod !== 'cod' && !user) {
+      setIsAuthRequired(true);
+      return;
+    }
     
     // Basic validation
     if (!formData.email || !formData.firstName || !formData.lastName || 
@@ -496,6 +541,44 @@ const Checkout = () => {
                    formData.paymentMethod === 'cod' ? 'Place Order (COD)' : 
                    'Proceed to Payment'}
                 </Button>
+
+                {/* Authentication Required Modal */}
+                {isAuthRequired && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+                      <h3 className="text-lg font-semibold mb-4">Account Required</h3>
+                      <p className="text-gray-600 mb-6">
+                        You need to sign in or create an account to proceed with online payments. 
+                        You can also choose Cash on Delivery to continue as a guest.
+                      </p>
+                      <div className="flex gap-3">
+                        <Button 
+                          onClick={() => navigate('/auth')}
+                          className="flex-1"
+                        >
+                          Sign In / Sign Up
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          onClick={() => {
+                            setFormData({...formData, paymentMethod: 'cod'});
+                            setIsAuthRequired(false);
+                          }}
+                          className="flex-1"
+                        >
+                          Use COD Instead
+                        </Button>
+                      </div>
+                      <Button 
+                        variant="ghost"
+                        onClick={() => setIsAuthRequired(false)}
+                        className="w-full mt-2 text-gray-500"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

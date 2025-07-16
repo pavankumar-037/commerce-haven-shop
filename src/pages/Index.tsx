@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingCart, User, Star, Filter, Gift } from 'lucide-react';
+import { Search, ShoppingCart, User, Star, Filter, Gift, LogOut, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import ComboOffers from '@/components/ComboOffers';
 import HeroCarousel from '@/components/HeroCarousel';
 import DynamicOffersSection from '@/components/DynamicOffersSection';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
   const [products, setProducts] = useState([]);
@@ -17,6 +18,8 @@ const Index = () => {
   const [showComboOffers, setShowComboOffers] = useState(false);
   const [siteSettings, setSiteSettings] = useState(null);
   const [themeSettings, setThemeSettings] = useState(null);
+  const [user, setUser] = useState<any>(null);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const { addToCart, getCartItemsCount } = useCart();
 
   const defaultHeroSlides = [
@@ -43,6 +46,29 @@ const Index = () => {
   const [heroSlides, setHeroSlides] = useState(defaultHeroSlides);
 
   useEffect(() => {
+    // Check authentication status
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+    
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+    });
+
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (showUserDropdown && !target.closest('.user-dropdown')) {
+        setShowUserDropdown(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
     // Load site settings and theme settings
     const loadSettings = async () => {
       const savedSettings = localStorage.getItem('siteSettings');
@@ -271,7 +297,12 @@ const Index = () => {
       setProducts(defaultProducts);
       localStorage.setItem('adminProducts', JSON.stringify(defaultProducts));
     }
-  }, []);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      subscription.unsubscribe();
+    };
+  }, [showUserDropdown]);
 
   const applyThemeToDOM = (theme: any) => {
     if (!theme) return;
@@ -358,6 +389,19 @@ const Index = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      setShowUserDropdown(false);
+      toast({
+        title: "Signed out successfully",
+        description: "Come back soon!",
+      });
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 via-neutral-50 to-slate-50">
       {/* Custom CSS for dynamic colors */}
@@ -428,9 +472,57 @@ const Index = () => {
               <Link to="/contact" className="text-stone-600 hover:text-amber-600 text-sm font-medium">
                 Contact
               </Link>
-              <Link to="/auth" className="text-stone-600 hover:text-amber-600">
-                <User className="w-6 h-6" />
-              </Link>
+              
+              {/* User Authentication Dropdown */}
+              <div className="relative user-dropdown">
+                {user ? (
+                  <div className="relative">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowUserDropdown(!showUserDropdown)}
+                      className="text-stone-600 hover:text-amber-600 p-2"
+                    >
+                      <User className="w-6 h-6" />
+                    </Button>
+                    
+                    {showUserDropdown && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-stone-200 z-50">
+                        <div className="p-3 border-b border-stone-200">
+                          <p className="text-sm font-medium text-stone-900 truncate">
+                            {user.user_metadata?.name || user.email}
+                          </p>
+                          <p className="text-xs text-stone-500 truncate">{user.email}</p>
+                        </div>
+                        <div className="py-1">
+                          <Link 
+                            to="/orders" 
+                            className="flex items-center px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            <Package className="w-4 h-4 mr-2" />
+                            My Orders
+                          </Link>
+                          <button
+                            onClick={handleSignOut}
+                            className="flex items-center w-full px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
+                          >
+                            <LogOut className="w-4 h-4 mr-2" />
+                            Sign Out
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link 
+                    to="/auth" 
+                    className="text-stone-600 hover:text-amber-600 flex items-center text-sm font-medium"
+                  >
+                    <User className="w-5 h-5 mr-1" />
+                    Sign In
+                  </Link>
+                )}
+              </div>
               <Link to="/cart" className="relative text-stone-600 hover:text-amber-600">
                 <ShoppingCart className="w-6 h-6" />
                 {getCartItemsCount() > 0 && (
