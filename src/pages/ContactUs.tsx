@@ -132,7 +132,21 @@ const ContactUs = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card>
             <CardHeader>
-              <CardTitle>Send us a Message</CardTitle>
+              <CardTitle className="flex items-center justify-between">
+                Send us a Message
+                {user && (
+                  <div className="flex items-center text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                    <User className="w-4 h-4 mr-1" />
+                    Signed in as {user.user_metadata?.name || user.email}
+                  </div>
+                )}
+              </CardTitle>
+              {user && (
+                <p className="text-sm text-gray-600">
+                  Your message will be linked to your account for better support
+                  tracking.
+                </p>
+              )}
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
