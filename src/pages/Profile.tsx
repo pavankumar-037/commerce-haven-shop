@@ -116,21 +116,62 @@ const Profile = () => {
   };
 
   const loadUserMessages = async (email: string) => {
-    // Load messages from localStorage for now (will be updated to use Supabase)
-    const allMessages = JSON.parse(
-      localStorage.getItem("contactMessages") || "[]",
-    );
-    const userMessages = allMessages
-      .filter((msg: any) => msg.email === email)
-      .map((msg: any) => ({
-        id: msg.id,
-        subject: msg.subject || "General Inquiry",
-        message: msg.message,
-        createdAt: msg.createdAt,
-        status: msg.status || "unread",
-        adminReply: msg.adminReply,
-      }));
-    setMessages(userMessages);
+    try {
+      // Try loading from Supabase first
+      const { data, error } =
+        await userMessagesService.getMessagesByEmail(email);
+
+      if (data && !error) {
+        setMessages(data);
+      } else {
+        // Fallback to localStorage
+        const allMessages = JSON.parse(
+          localStorage.getItem("contactMessages") || "[]",
+        );
+        const userMessages = allMessages
+          .filter((msg: any) => msg.email === email)
+          .map((msg: any) => ({
+            id: msg.id,
+            user_id: msg.userId,
+            name: msg.name,
+            email: msg.email,
+            subject: msg.subject || "General Inquiry",
+            message: msg.message,
+            status: msg.status || "unread",
+            admin_reply: msg.adminReply,
+            admin_reply_at: msg.adminReplyAt,
+            admin_replied_by: msg.adminRepliedBy,
+            is_authenticated: msg.isAuthenticated || false,
+            created_at: msg.createdAt,
+            updated_at: msg.createdAt,
+          }));
+        setMessages(userMessages);
+      }
+    } catch (error) {
+      console.error("Error loading user messages:", error);
+      // Fallback to localStorage
+      const allMessages = JSON.parse(
+        localStorage.getItem("contactMessages") || "[]",
+      );
+      const userMessages = allMessages
+        .filter((msg: any) => msg.email === email)
+        .map((msg: any) => ({
+          id: msg.id,
+          user_id: msg.userId,
+          name: msg.name,
+          email: msg.email,
+          subject: msg.subject || "General Inquiry",
+          message: msg.message,
+          status: msg.status || "unread",
+          admin_reply: msg.adminReply,
+          admin_reply_at: msg.adminReplyAt,
+          admin_replied_by: msg.adminRepliedBy,
+          is_authenticated: msg.isAuthenticated || false,
+          created_at: msg.createdAt,
+          updated_at: msg.createdAt,
+        }));
+      setMessages(userMessages);
+    }
   };
 
   const handleUpdateProfile = async () => {
