@@ -15,8 +15,13 @@ serve(async (req) => {
   try {
     const { items, total, userEmail, paymentMethod } = await req.json();
 
-    // Initialize Stripe with test key
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "sk_test_...", {
+    // Initialize Stripe with secret key
+    const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY") || Deno.env.get("Secret key");
+    if (!stripeSecretKey) {
+      throw new Error("Stripe secret key not found");
+    }
+    
+    const stripe = new Stripe(stripeSecretKey, {
       apiVersion: "2023-10-16",
     });
 
