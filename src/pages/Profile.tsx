@@ -24,6 +24,10 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { ordersService, type Order } from "@/integrations/supabase/orders";
+import {
+  userMessagesService,
+  type UserMessage,
+} from "@/integrations/supabase/userMessages";
 import { toast } from "@/hooks/use-toast";
 
 interface UserProfile {
