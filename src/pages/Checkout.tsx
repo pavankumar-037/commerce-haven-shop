@@ -261,16 +261,20 @@ const Checkout = () => {
     }
   };
 
-  const handlePaymentFailure = (error: any) => {
+  const handlePaymentFailure = (error: any, orderId?: string) => {
     console.error("Payment failed:", error);
-    toast({
-      title: "Payment failed",
-      description:
-        error.message ||
-        "Please try again or choose a different payment method",
-      variant: "destructive",
-    });
+
     setIsProcessing(false);
+
+    // Navigate to payment error page with details
+    navigate("/payment-error", {
+      state: {
+        orderId,
+        error: error.message || "Payment processing failed",
+        paymentMethod: formData.paymentMethod,
+        amount: total,
+      },
+    });
   };
 
   const handleCODOrder = async () => {
