@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const ContactUs = () => {
   const { toast } = useToast();
+  const [user, setUser] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
