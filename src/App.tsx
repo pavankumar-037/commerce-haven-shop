@@ -27,6 +27,12 @@ import AdminCoupons from "./pages/AdminCoupons";
 import AdminMessages from "./pages/AdminMessages";
 import AdminSettings from "./pages/AdminSettings";
 import Debug from "./pages/Debug";
+import AboutUs from "./pages/AboutUs";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import FAQ from "./pages/FAQ";
+import ShippingReturns from "./pages/ShippingReturns";
+import SizeGuide from "./pages/SizeGuide";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
@@ -76,6 +82,14 @@ const App = () => (
 
               {/* Debug route for development */}
               <Route path="/debug" element={<Debug />} />
+
+              {/* General Pages */}
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/shipping-returns" element={<ShippingReturns />} />
+              <Route path="/size-guide" element={<SizeGuide />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
