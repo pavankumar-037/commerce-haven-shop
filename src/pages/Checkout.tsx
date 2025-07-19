@@ -125,6 +125,18 @@ const Checkout = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
           <p>Loading checkout...</p>
+          <div className="mt-4">
+            <Button
+              onClick={() => {
+                console.log("Force loading cart, current items:", cartItems);
+                setIsCartLoaded(true);
+              }}
+              variant="outline"
+              size="sm"
+            >
+              Continue Anyway
+            </Button>
+          </div>
         </div>
       </div>
     );
