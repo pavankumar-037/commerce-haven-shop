@@ -19,6 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ordersService, type Order } from "@/integrations/supabase/orders";
 import { toast } from "@/hooks/use-toast";
 
+<<<<<<< HEAD
 interface OrderDisplay {
   id: string;
   date: string;
@@ -134,6 +135,64 @@ const Orders = () => {
         title: "Error searching orders",
         description: "Failed to search orders by email",
         variant: "destructive",
+=======
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Package, Calendar, DollarSign } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+
+const Orders = () => {
+  const navigate = useNavigate();
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    checkAuthAndFetchOrders();
+  }, []);
+
+  const checkAuthAndFetchOrders = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Please sign in",
+          description: "You need to sign in to view your orders",
+          variant: "destructive"
+        });
+        navigate('/auth');
+        return;
+      }
+
+      setUser(session.user);
+      await fetchOrders(session.user.email);
+    } catch (error) {
+      console.error('Auth check error:', error);
+      navigate('/auth');
+    }
+  };
+
+  const fetchOrders = async (userEmail: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_email', userEmail)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setOrders(data || []);
+    } catch (error) {
+      console.error('Orders fetch error:', error);
+      toast({
+        title: "Failed to load orders",
+        description: "Please try again later",
+        variant: "destructive"
+>>>>>>> origin/main
       });
     } finally {
       setLoading(false);
@@ -141,6 +200,7 @@ const Orders = () => {
   };
 
   const getStatusColor = (status: string) => {
+<<<<<<< HEAD
     switch (status.toLowerCase()) {
       case "delivered":
         return "bg-green-100 text-green-800";
@@ -188,8 +248,30 @@ const Orders = () => {
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
+=======
+    switch (status?.toLowerCase()) {
+      case 'completed': 
+      case 'delivered': return 'bg-green-100 text-green-800';
+      case 'shipped': 
+      case 'processing': return 'bg-blue-100 text-blue-800';
+      case 'pending': 
+      case 'confirmed': return 'bg-yellow-100 text-yellow-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+>>>>>>> origin/main
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading your orders...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -215,6 +297,7 @@ const Orders = () => {
           </Button>
         </div>
 
+<<<<<<< HEAD
         {/* Search Section */}
         <Card className="mb-6">
           <CardHeader>
@@ -257,6 +340,16 @@ const Orders = () => {
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
             <span className="ml-2">Loading orders...</span>
+=======
+        {orders.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">No orders yet</h2>
+            <p className="text-gray-600 mb-6">Start shopping to see your orders here!</p>
+            <Link to="/">
+              <Button>Start Shopping</Button>
+            </Link>
+>>>>>>> origin/main
           </div>
         ) : orders.length === 0 ? (
           <Card>
@@ -278,6 +371,7 @@ const Orders = () => {
           </Card>
         ) : (
           <div className="space-y-6">
+<<<<<<< HEAD
             {orders.map((order) => {
               const StatusIcon = getStatusIcon(order.status);
               return (
@@ -300,6 +394,35 @@ const Orders = () => {
                         >
                           Payment: {order.paymentStatus}
                         </Badge>
+=======
+            {orders.map(order => (
+              <div key={order.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div className="p-6 border-b border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-4">
+                      <h3 className="text-lg font-semibold">Order #{order.order_number}</h3>
+                      <Badge className={getStatusColor(order.order_status)}>
+                        {order.order_status}
+                      </Badge>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-600 flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {new Date(order.created_at).toLocaleDateString()}
+                      </p>
+                      <p className="text-lg font-semibold flex items-center">
+                        <DollarSign className="w-4 h-4 mr-1" />
+                        ₹{Number(order.total_amount).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {order.items.map((item: any, index: number) => (
+                      <div key={index} className="flex justify-between items-center text-sm">
+                        <span>{item.name} × {item.quantity}</span>
+                        <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+>>>>>>> origin/main
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-gray-600 flex items-center justify-end">
@@ -375,9 +498,54 @@ const Orders = () => {
                       )}
                     </div>
                   </div>
+<<<<<<< HEAD
                 </Card>
               );
             })}
+=======
+
+                  <div className="mt-4 pt-3 border-t border-gray-200">
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Payment Method:</span>
+                      <span>{order.payment_method}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Payment Status:</span>
+                      <span className={`font-semibold ${
+                        order.payment_status === 'completed' ? 'text-green-600' : 
+                        order.payment_status === 'pending' ? 'text-yellow-600' : 'text-red-600'
+                      }`}>
+                        {order.payment_status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-gray-50">
+                  <div className="flex space-x-3">
+                    <Link to={`/track-order?order=${order.order_number}`}>
+                      <Button variant="outline" size="sm">
+                        Track Order
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        // Add items to cart logic here
+                        toast({
+                          title: "Feature coming soon!",
+                          description: "Reorder feature will be available soon"
+                        });
+                      }}
+                    >
+                      Reorder Items
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+>>>>>>> origin/main
           </div>
         )}
       </div>

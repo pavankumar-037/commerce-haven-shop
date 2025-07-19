@@ -1,14 +1,17 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Mail, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [loginData, setLoginData] = useState({
     email: '',
     password: ''
@@ -21,30 +24,98 @@ const Auth = () => {
     confirmPassword: ''
   });
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/');
+      }
+    };
+    checkUser();
+  }, [navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate login
-    localStorage.setItem('user', JSON.stringify({ 
-      email: loginData.email, 
-      name: 'User' 
-    }));
-    alert('Login successful!');
-    navigate('/');
+    setLoading(true);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: loginData.email,
+        password: loginData.password,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Login successful!",
+        description: "Welcome back to CommerceHaven",
+      });
+      
+      navigate('/');
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (signupData.password !== signupData.confirmPassword) {
-      alert('Passwords do not match!');
+      toast({
+        title: "Password mismatch",
+        description: "Passwords do not match!",
+        variant: "destructive",
+      });
       return;
     }
-    // Simulate signup
-    localStorage.setItem('user', JSON.stringify({ 
-      email: signupData.email, 
-      name: signupData.name 
-    }));
-    alert('Account created successfully!');
-    navigate('/');
+
+    if (signupData.password.length < 6) {
+      toast({
+        title: "Weak password",
+        description: "Password must be at least 6 characters long",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: signupData.email,
+        password: signupData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            name: signupData.name,
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Account created successfully!",
+        description: "Please check your email to confirm your account",
+      });
+      
+      navigate('/');
+    } catch (error: any) {
+      toast({
+        title: "Signup failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -101,8 +172,8 @@ const Auth = () => {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Sign In
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Signing In...' : 'Sign In'}
                 </Button>
               </form>
             </TabsContent>
@@ -173,8 +244,8 @@ const Auth = () => {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Create Account
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Creating Account...' : 'Create Account'}
                 </Button>
               </form>
             </TabsContent>
