@@ -1,39 +1,39 @@
-
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail, MapPin, Send } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Mail, MapPin, Send, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ContactUs = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name || !formData.email || !formData.message) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -44,11 +44,16 @@ const ContactUs = () => {
       id: Date.now().toString(),
       ...formData,
       createdAt: new Date().toISOString(),
-      status: 'unread'
+      status: "unread",
     };
 
-    const existingMessages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
-    localStorage.setItem('contactMessages', JSON.stringify([contactMessage, ...existingMessages]));
+    const existingMessages = JSON.parse(
+      localStorage.getItem("contactMessages") || "[]",
+    );
+    localStorage.setItem(
+      "contactMessages",
+      JSON.stringify([contactMessage, ...existingMessages]),
+    );
 
     setTimeout(() => {
       setIsSubmitting(false);
@@ -56,12 +61,12 @@ const ContactUs = () => {
         title: "Message Sent!",
         description: "Thank you for contacting us. We'll get back to you soon.",
       });
-      
+
       setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
       });
     }, 1500);
   };
@@ -69,7 +74,10 @@ const ContactUs = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/" className="inline-flex items-center text-primary hover:text-primary/80 mb-6">
+        <Link
+          to="/"
+          className="inline-flex items-center text-primary hover:text-primary/80 mb-6"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
         </Link>
@@ -88,7 +96,7 @@ const ContactUs = () => {
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
                     placeholder="Enter your full name"
                     required
                   />
@@ -100,7 +108,7 @@ const ContactUs = () => {
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
                     placeholder="Enter your email address"
                     required
                   />
@@ -111,7 +119,9 @@ const ContactUs = () => {
                   <Input
                     id="subject"
                     value={formData.subject}
-                    onChange={(e) => handleInputChange('subject', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("subject", e.target.value)
+                    }
                     placeholder="Enter message subject"
                   />
                 </div>
@@ -121,20 +131,22 @@ const ContactUs = () => {
                   <Textarea
                     id="message"
                     value={formData.message}
-                    onChange={(e) => handleInputChange('message', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("message", e.target.value)
+                    }
                     placeholder="Enter your message here..."
                     rows={6}
                     required
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={isSubmitting}
                   className="w-full"
                 >
                   {isSubmitting ? (
-                    'Sending...'
+                    "Sending..."
                   ) : (
                     <>
                       <Send className="w-4 h-4 mr-2" />
@@ -156,7 +168,9 @@ const ContactUs = () => {
                   <Mail className="w-5 h-5 text-primary mt-1" />
                   <div>
                     <h4 className="font-semibold">Email</h4>
-                    <p className="text-gray-600">cuteliitleprincess150@gmail.com</p>
+                    <p className="text-gray-600">
+                      cuteliitleprincess150@gmail.com
+                    </p>
                   </div>
                 </div>
 
@@ -165,7 +179,8 @@ const ContactUs = () => {
                   <div>
                     <h4 className="font-semibold">Address</h4>
                     <p className="text-gray-600">
-                      Mumbai, Maharashtra<br />
+                      Mumbai, Maharashtra
+                      <br />
                       India
                     </p>
                   </div>
