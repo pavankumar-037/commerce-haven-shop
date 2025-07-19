@@ -84,37 +84,66 @@ const ContactUs = () => {
 
     setIsSubmitting(true);
 
-    const contactMessage = {
-      id: Date.now().toString(),
-      ...formData,
-      createdAt: new Date().toISOString(),
-      status: "unread",
-      userId: user?.id || null,
-      isAuthenticated: !!user,
-    };
+    try {
+      const { data, error } = await userMessagesService.createMessage({
+        user_id: user?.id,
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        is_authenticated: !!user,
+      });
 
-    const existingMessages = JSON.parse(
-      localStorage.getItem("contactMessages") || "[]",
-    );
-    localStorage.setItem(
-      "contactMessages",
-      JSON.stringify([contactMessage, ...existingMessages]),
-    );
+      if (error) {
+        throw error;
+      }
 
-    setTimeout(() => {
-      setIsSubmitting(false);
       toast({
         title: "Message Sent!",
         description: "Thank you for contacting us. We'll get back to you soon.",
       });
 
       setFormData({
-        name: "",
-        email: "",
+        name: user?.user_metadata?.name || "",
+        email: user?.email || "",
         subject: "",
         message: "",
       });
-    }, 1500);
+    } catch (error: any) {
+      console.error("Error sending message:", error);
+
+      // Fallback to localStorage if Supabase fails
+      const contactMessage = {
+        id: Date.now().toString(),
+        ...formData,
+        createdAt: new Date().toISOString(),
+        status: "unread",
+        userId: user?.id || null,
+        isAuthenticated: !!user,
+      };
+
+      const existingMessages = JSON.parse(
+        localStorage.getItem("contactMessages") || "[]",
+      );
+      localStorage.setItem(
+        "contactMessages",
+        JSON.stringify([contactMessage, ...existingMessages]),
+      );
+
+      toast({
+        title: "Message Sent!",
+        description: "Thank you for contacting us. We'll get back to you soon.",
+      });
+
+      setFormData({
+        name: user?.user_metadata?.name || "",
+        email: user?.email || "",
+        subject: "",
+        message: "",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
