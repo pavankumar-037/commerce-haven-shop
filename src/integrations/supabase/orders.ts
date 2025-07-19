@@ -215,6 +215,8 @@ CREATE POLICY "Allow all operations" ON public.orders FOR ALL USING (true);
           order_status: "pending",
         };
 
+        console.log("Old schema order data:", oldSchemaOrder);
+
         const result = await supabase
           .from("orders")
           .insert(oldSchemaOrder)
