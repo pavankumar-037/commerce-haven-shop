@@ -44,11 +44,61 @@ const AdminMessages = () => {
       return;
     }
 
-    const savedMessages = localStorage.getItem("contactMessages");
-    if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
-    }
+    loadMessages();
   }, [navigate]);
+
+  const loadMessages = async () => {
+    try {
+      const { data, error } = await userMessagesService.getAllMessages();
+
+      if (data && !error) {
+        setMessages(data);
+      } else {
+        // Fallback to localStorage
+        const savedMessages = localStorage.getItem("contactMessages");
+        if (savedMessages) {
+          const localMessages = JSON.parse(savedMessages).map((msg: any) => ({
+            id: msg.id,
+            user_id: msg.userId,
+            name: msg.name,
+            email: msg.email,
+            subject: msg.subject || "General Inquiry",
+            message: msg.message,
+            status: msg.status || "unread",
+            admin_reply: msg.adminReply,
+            admin_reply_at: msg.adminReplyAt,
+            admin_replied_by: msg.adminRepliedBy,
+            is_authenticated: msg.isAuthenticated || false,
+            created_at: msg.createdAt,
+            updated_at: msg.createdAt,
+          }));
+          setMessages(localMessages);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading messages:", error);
+      // Fallback to localStorage
+      const savedMessages = localStorage.getItem("contactMessages");
+      if (savedMessages) {
+        const localMessages = JSON.parse(savedMessages).map((msg: any) => ({
+          id: msg.id,
+          user_id: msg.userId,
+          name: msg.name,
+          email: msg.email,
+          subject: msg.subject || "General Inquiry",
+          message: msg.message,
+          status: msg.status || "unread",
+          admin_reply: msg.adminReply,
+          admin_reply_at: msg.adminReplyAt,
+          admin_replied_by: msg.adminRepliedBy,
+          is_authenticated: msg.isAuthenticated || false,
+          created_at: msg.createdAt,
+          updated_at: msg.createdAt,
+        }));
+        setMessages(localMessages);
+      }
+    }
+  };
 
   const filteredMessages = messages.filter((message) => {
     const matchesSearch =
