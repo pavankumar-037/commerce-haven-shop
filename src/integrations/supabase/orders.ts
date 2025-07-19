@@ -177,13 +177,18 @@ CREATE POLICY "Allow all operations" ON public.orders FOR ALL USING (true);
         order_status: "pending",
       };
 
-      console.log("Attempting to insert order with new schema...");
+      console.log(
+        "Attempting to insert order with new schema:",
+        newSchemaOrder,
+      );
 
       let { data, error } = await supabase
         .from("orders")
         .insert(newSchemaOrder)
         .select()
         .single();
+
+      console.log("New schema attempt result:", { data, error });
 
       // If the new schema fails, try with the old schema format
       if (
