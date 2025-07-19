@@ -395,7 +395,7 @@ const Checkout = () => {
           throw new Error("Invalid payment method");
       }
     } catch (error) {
-      handlePaymentFailure(error);
+      handlePaymentFailure(error, orderId);
     }
   };
 
