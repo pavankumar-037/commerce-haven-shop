@@ -39,14 +39,7 @@ interface UserProfile {
   dateJoined: string;
 }
 
-interface UserMessage {
-  id: string;
-  subject: string;
-  message: string;
-  createdAt: string;
-  status: "unread" | "read" | "replied";
-  adminReply?: string;
-}
+// Remove local interface as we're using the one from service
 
 const Profile = () => {
   const navigate = useNavigate();
