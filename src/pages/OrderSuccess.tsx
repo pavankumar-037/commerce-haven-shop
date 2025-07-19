@@ -67,9 +67,15 @@ const OrderSuccess = () => {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Order ID:</span>
-                <span className="font-mono font-semibold text-lg">
+                <span className="font-mono font-semibold text-lg text-blue-600">
                   #{orderId?.slice(-8).toUpperCase()}
                 </span>
+              </div>
+              <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
+                <p className="text-sm text-blue-800">
+                  <strong>Save this Order ID:</strong> Use this for tracking
+                  your order or contacting support.
+                </p>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Total Amount:</span>
