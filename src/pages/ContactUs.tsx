@@ -20,6 +20,48 @@ const ContactUs = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    // Check if user is logged in and auto-fill form
+    const checkAuth = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
+        setFormData((prev) => ({
+          ...prev,
+          name: session.user.user_metadata?.name || prev.name,
+          email: session.user.email || prev.email,
+        }));
+      }
+    };
+
+    checkAuth();
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        setFormData((prev) => ({
+          ...prev,
+          name: session.user.user_metadata?.name || prev.name,
+          email: session.user.email || prev.email,
+        }));
+      } else {
+        setUser(null);
+        setFormData((prev) => ({
+          ...prev,
+          name: "",
+          email: "",
+        }));
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
