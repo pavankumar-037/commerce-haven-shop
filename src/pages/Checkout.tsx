@@ -65,14 +65,20 @@ const Checkout = () => {
   useEffect(() => {
     // Give time for cart to load from localStorage
     const timer = setTimeout(() => {
+      console.log("Cart loading timeout reached, cartItems:", cartItems);
       setIsCartLoaded(true);
     }, 100);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [cartItems]);
 
   useEffect(() => {
+    console.log("Cart state changed:", {
+      isCartLoaded,
+      cartItemsLength: cartItems.length,
+    });
     if (isCartLoaded && cartItems.length === 0) {
+      console.log("Cart is empty, redirecting to cart page");
       navigate("/cart");
     }
   }, [cartItems, navigate, isCartLoaded]);
