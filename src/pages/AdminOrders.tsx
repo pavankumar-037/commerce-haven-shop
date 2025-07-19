@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Package,
@@ -96,22 +96,33 @@ const AdminOrders = () => {
 
   const transformSupabaseOrder = (order: SupabaseOrder): OrderDisplay => {
     const customerInfo = order.customer_info as any;
+
+    // Safe property access with fallbacks
+    const firstName =
+      customerInfo?.firstName || customerInfo?.first_name || "N/A";
+    const lastName = customerInfo?.lastName || customerInfo?.last_name || "";
+    const fullName = `${firstName} ${lastName}`.trim() || "Unknown Customer";
+
     return {
       id: order.id,
-      customerName: `${customerInfo.firstName} ${customerInfo.lastName}`,
-      email: customerInfo.email,
-      phone: customerInfo.phone,
-      total: order.total,
-      status: order.order_status,
-      items: order.items as any[],
+      customerName: fullName,
+      email: customerInfo?.email || "No email provided",
+      phone: customerInfo?.phone || "No phone provided",
+      total: order.total || 0,
+      status: order.order_status || "pending",
+      items: (order.items as any[]) || [],
       shippingAddress: {
-        street: customerInfo.address,
-        city: customerInfo.city,
-        state: customerInfo.state,
-        zipCode: customerInfo.zipCode,
+        street:
+          customerInfo?.address ||
+          customerInfo?.street ||
+          "No address provided",
+        city: customerInfo?.city || "No city provided",
+        state: customerInfo?.state || "No state provided",
+        zipCode:
+          customerInfo?.zipCode || customerInfo?.zip_code || "No zip provided",
       },
-      createdAt: order.created_at,
-      paymentMethod: order.payment_method,
+      createdAt: order.created_at || new Date().toISOString(),
+      paymentMethod: order.payment_method || "cod",
     };
   };
 
@@ -140,30 +151,42 @@ const AdminOrders = () => {
 
         // Fallback to localStorage orders
         const localOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-        const localOrdersDisplay = localOrders.map((order: any) => ({
-          id: order.id,
-          customerName: order.customerInfo
-            ? `${order.customerInfo.firstName} ${order.customerInfo.lastName}`
-            : `${order.customer_info?.firstName} ${order.customer_info?.lastName}`,
-          email:
-            order.customerInfo?.email ||
-            order.customer_info?.email ||
-            order.user_email,
-          phone: order.customerInfo?.phone || order.customer_info?.phone,
-          total: order.total,
-          status: order.status || order.order_status || "pending",
-          items: order.items,
-          shippingAddress: {
-            street: order.customerInfo?.address || order.customer_info?.address,
-            city: order.customerInfo?.city || order.customer_info?.city,
-            state: order.customerInfo?.state || order.customer_info?.state,
-            zipCode:
-              order.customerInfo?.zipCode || order.customer_info?.zipCode,
-          },
-          createdAt:
-            order.createdAt || order.created_at || new Date().toISOString(),
-          paymentMethod: order.paymentMethod || order.payment_method || "cod",
-        }));
+        const localOrdersDisplay = localOrders.map((order: any) => {
+          // Safe property access for local orders
+          const customerInfo = order.customerInfo || order.customer_info || {};
+          const firstName =
+            customerInfo.firstName || customerInfo.first_name || "N/A";
+          const lastName =
+            customerInfo.lastName || customerInfo.last_name || "";
+          const fullName =
+            `${firstName} ${lastName}`.trim() || "Unknown Customer";
+
+          return {
+            id: order.id || "unknown-id",
+            customerName: fullName,
+            email:
+              customerInfo.email || order.user_email || "No email provided",
+            phone: customerInfo.phone || "No phone provided",
+            total: order.total || 0,
+            status: order.status || order.order_status || "pending",
+            items: order.items || [],
+            shippingAddress: {
+              street:
+                customerInfo.address ||
+                customerInfo.street ||
+                "No address provided",
+              city: customerInfo.city || "No city provided",
+              state: customerInfo.state || "No state provided",
+              zipCode:
+                customerInfo.zipCode ||
+                customerInfo.zip_code ||
+                "No zip provided",
+            },
+            createdAt:
+              order.createdAt || order.created_at || new Date().toISOString(),
+            paymentMethod: order.paymentMethod || order.payment_method || "cod",
+          };
+        });
 
         setOrders(localOrdersDisplay);
 
@@ -186,29 +209,40 @@ const AdminOrders = () => {
 
       // Final fallback to localStorage
       const localOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-      const localOrdersDisplay = localOrders.map((order: any) => ({
-        id: order.id,
-        customerName: order.customerInfo
-          ? `${order.customerInfo.firstName} ${order.customerInfo.lastName}`
-          : `${order.customer_info?.firstName} ${order.customer_info?.lastName}`,
-        email:
-          order.customerInfo?.email ||
-          order.customer_info?.email ||
-          order.user_email,
-        phone: order.customerInfo?.phone || order.customer_info?.phone,
-        total: order.total,
-        status: order.status || order.order_status || "pending",
-        items: order.items,
-        shippingAddress: {
-          street: order.customerInfo?.address || order.customer_info?.address,
-          city: order.customerInfo?.city || order.customer_info?.city,
-          state: order.customerInfo?.state || order.customer_info?.state,
-          zipCode: order.customerInfo?.zipCode || order.customer_info?.zipCode,
-        },
-        createdAt:
-          order.createdAt || order.created_at || new Date().toISOString(),
-        paymentMethod: order.paymentMethod || order.payment_method || "cod",
-      }));
+      const localOrdersDisplay = localOrders.map((order: any) => {
+        // Safe property access for local orders in catch block
+        const customerInfo = order.customerInfo || order.customer_info || {};
+        const firstName =
+          customerInfo.firstName || customerInfo.first_name || "N/A";
+        const lastName = customerInfo.lastName || customerInfo.last_name || "";
+        const fullName =
+          `${firstName} ${lastName}`.trim() || "Unknown Customer";
+
+        return {
+          id: order.id || "unknown-id",
+          customerName: fullName,
+          email: customerInfo.email || order.user_email || "No email provided",
+          phone: customerInfo.phone || "No phone provided",
+          total: order.total || 0,
+          status: order.status || order.order_status || "pending",
+          items: order.items || [],
+          shippingAddress: {
+            street:
+              customerInfo.address ||
+              customerInfo.street ||
+              "No address provided",
+            city: customerInfo.city || "No city provided",
+            state: customerInfo.state || "No state provided",
+            zipCode:
+              customerInfo.zipCode ||
+              customerInfo.zip_code ||
+              "No zip provided",
+          },
+          createdAt:
+            order.createdAt || order.created_at || new Date().toISOString(),
+          paymentMethod: order.paymentMethod || order.payment_method || "cod",
+        };
+      });
 
       setOrders(localOrdersDisplay);
 
