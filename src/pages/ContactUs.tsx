@@ -141,10 +141,17 @@ const ContactUs = () => {
                   </div>
                 )}
               </CardTitle>
-              {user && (
+              {user ? (
                 <p className="text-sm text-gray-600">
                   Your message will be linked to your account for better support
                   tracking.
+                </p>
+              ) : (
+                <p className="text-sm text-gray-600">
+                  <Link to="/auth" className="text-primary hover:underline">
+                    Sign in
+                  </Link>{" "}
+                  to track your messages and get faster support responses.
                 </p>
               )}
             </CardHeader>
