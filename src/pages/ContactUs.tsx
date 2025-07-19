@@ -165,6 +165,8 @@ const ContactUs = () => {
                     onChange={(e) => handleInputChange("name", e.target.value)}
                     placeholder="Enter your full name"
                     required
+                    readOnly={!!user}
+                    className={user ? "bg-gray-50" : ""}
                   />
                 </div>
 
