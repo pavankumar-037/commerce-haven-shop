@@ -263,12 +263,17 @@ const AdminOrders = () => {
   };
 
   const filteredOrders = orders.filter((order) => {
+    // Safe property access for filtering
+    const orderId = order.id || "";
+    const customerName = order.customerName || "";
+    const email = order.email || "";
+    const status = order.status || "pending";
+
     const matchesSearch =
-      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || order.status === statusFilter;
+      orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "all" || status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -374,10 +379,20 @@ const AdminOrders = () => {
   };
 
   const getOrderTotal = (order: OrderDisplay) => {
-    return (
-      order.total ||
-      order.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    );
+    if (order.total && order.total > 0) {
+      return order.total;
+    }
+
+    // Safely calculate total from items if no total is available
+    if (order.items && Array.isArray(order.items)) {
+      return order.items.reduce((sum, item) => {
+        const price = item?.price || 0;
+        const quantity = item?.quantity || 0;
+        return sum + price * quantity;
+      }, 0);
+    }
+
+    return 0;
   };
 
   if (loading) {
@@ -502,7 +517,9 @@ const AdminOrders = () => {
                           <p className="text-sm text-gray-500">{order.email}</p>
                         </div>
                       </TableCell>
-                      <TableCell>{order.items.length} items</TableCell>
+                      <TableCell>
+                        {order.items ? order.items.length : 0} items
+                      </TableCell>
                       <TableCell className="font-semibold">
                         ₹{getOrderTotal(order).toFixed(2)}
                       </TableCell>
