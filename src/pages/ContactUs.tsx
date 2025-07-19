@@ -179,6 +179,8 @@ const ContactUs = () => {
                     onChange={(e) => handleInputChange("email", e.target.value)}
                     placeholder="Enter your email address"
                     required
+                    readOnly={!!user}
+                    className={user ? "bg-gray-50" : ""}
                   />
                 </div>
 
