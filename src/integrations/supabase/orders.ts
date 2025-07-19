@@ -31,6 +31,17 @@ export interface OrderData {
   paymentMethod: string;
 }
 
+// Generate order number in JavaScript to avoid database function issues
+const generateOrderNumber = (): string => {
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0, 10).replace(/-/g, ""); // YYYYMMDD
+  const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, ""); // HHMMSS
+  const randomSuffix = Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, "0");
+  return `ORD-${dateStr}-${timeStr}-${randomSuffix}`;
+};
+
 export const ordersService = {
   async createOrdersTable(): Promise<{ success: boolean; error?: string }> {
     console.log(
