@@ -167,27 +167,54 @@ CREATE POLICY "Allow all operations" ON public.orders FOR ALL USING (true);
         paymentMethod: orderData.paymentMethod,
       });
 
-      const orderInsert: OrderInsert = {
+      // Try to create order with new schema first (more minimal)
+      const newSchemaOrder = {
         user_email: orderData.userEmail,
-        customer_info: orderData.customerInfo,
         items: orderData.items,
-        subtotal: orderData.subtotal,
-        coupon_discount: orderData.couponDiscount,
-        shipping_cost: orderData.shippingCost,
-        total: orderData.total,
-        applied_coupon: orderData.appliedCoupon || null,
+        total_amount: orderData.total,
         payment_method: orderData.paymentMethod,
         payment_status: "pending",
         order_status: "pending",
       };
 
-      console.log("Attempting to insert order into Supabase...");
+      console.log("Attempting to insert order with new schema...");
 
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("orders")
-        .insert(orderInsert)
+        .insert(newSchemaOrder)
         .select()
         .single();
+
+      // If the new schema fails, try with the old schema format
+      if (
+        error &&
+        (error.code === "PGRST204" || error.message?.includes("column"))
+      ) {
+        console.log("New schema failed, trying old schema format...");
+
+        const oldSchemaOrder: OrderInsert = {
+          user_email: orderData.userEmail,
+          customer_info: orderData.customerInfo,
+          items: orderData.items,
+          subtotal: orderData.subtotal,
+          coupon_discount: orderData.couponDiscount,
+          shipping_cost: orderData.shippingCost,
+          total: orderData.total,
+          applied_coupon: orderData.appliedCoupon || null,
+          payment_method: orderData.paymentMethod,
+          payment_status: "pending",
+          order_status: "pending",
+        };
+
+        const result = await supabase
+          .from("orders")
+          .insert(oldSchemaOrder)
+          .select()
+          .single();
+
+        data = result.data;
+        error = result.error;
+      }
 
       console.log("Supabase insert result:", { data, error });
 
