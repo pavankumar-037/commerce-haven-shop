@@ -604,7 +604,7 @@ const Profile = () => {
                           <div>
                             <h4 className="font-semibold">{message.subject}</h4>
                             <p className="text-sm text-gray-600">
-                              {formatDate(message.createdAt)}
+                              {formatDate(message.created_at)}
                             </p>
                           </div>
                           <Badge
@@ -617,14 +617,19 @@ const Profile = () => {
                         <p className="text-sm text-gray-700 mb-2">
                           {message.message.substring(0, 150)}...
                         </p>
-                        {message.adminReply && (
+                        {message.admin_reply && (
                           <div className="bg-blue-50 p-3 rounded mt-2">
                             <p className="text-sm font-semibold text-blue-900 mb-1">
                               Admin Reply:
                             </p>
                             <p className="text-sm text-blue-800">
-                              {message.adminReply}
+                              {message.admin_reply}
                             </p>
+                            {message.admin_reply_at && (
+                              <p className="text-xs text-blue-600 mt-1">
+                                Replied on {formatDate(message.admin_reply_at)}
+                              </p>
+                            )}
                           </div>
                         )}
                       </div>
