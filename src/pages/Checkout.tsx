@@ -387,7 +387,7 @@ const Checkout = () => {
             orderId,
             customerInfo,
             onSuccess: (response) => handlePaymentSuccess(response, orderId),
-            onFailure: handlePaymentFailure,
+            onFailure: (error) => handlePaymentFailure(error, orderId),
           });
           break;
 
