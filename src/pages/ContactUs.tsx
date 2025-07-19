@@ -88,6 +88,8 @@ const ContactUs = () => {
       ...formData,
       createdAt: new Date().toISOString(),
       status: "unread",
+      userId: user?.id || null,
+      isAuthenticated: !!user,
     };
 
     const existingMessages = JSON.parse(
