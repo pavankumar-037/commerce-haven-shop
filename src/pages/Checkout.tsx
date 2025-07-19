@@ -474,13 +474,16 @@ const Checkout = () => {
       }
     } catch (error: any) {
       console.error("Payment error:", error);
-      toast({
-        title: "Payment failed",
-        description: error.message || "Please try again or contact support.",
-        variant: "destructive",
-      });
-    } finally {
       setIsProcessing(false);
+
+      // Navigate to payment error page
+      navigate("/payment-error", {
+        state: {
+          error: error.message || "Payment session creation failed",
+          paymentMethod: formData.paymentMethod,
+          amount: total,
+        },
+      });
     }
   };
 
