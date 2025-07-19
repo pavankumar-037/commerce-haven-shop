@@ -11,6 +11,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Auth from "./pages/Auth";
 import OrderSuccess from "./pages/OrderSuccess";
+import PaymentError from "./pages/PaymentError";
 import Orders from "./pages/Orders";
 import OrderTracking from "./pages/OrderTracking";
 import ContactUs from "./pages/ContactUs";
