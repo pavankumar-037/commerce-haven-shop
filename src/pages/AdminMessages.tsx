@@ -28,10 +28,10 @@ import {
 const AdminMessages = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [messages, setMessages] = useState<UserMessage[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
-  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(
+  const [selectedMessage, setSelectedMessage] = useState<UserMessage | null>(
     null,
   );
   const [showReplyForm, setShowReplyForm] = useState(false);
