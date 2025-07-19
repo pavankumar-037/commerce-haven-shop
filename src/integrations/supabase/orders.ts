@@ -195,7 +195,11 @@ CREATE POLICY "Allow all operations" ON public.orders FOR ALL USING (true);
         error &&
         (error.code === "PGRST204" || error.message?.includes("column"))
       ) {
-        console.log("New schema failed, trying old schema format...");
+        console.log("New schema failed with error:", {
+          code: error.code,
+          message: error.message,
+        });
+        console.log("Trying old schema format...");
 
         const oldSchemaOrder: OrderInsert = {
           user_email: orderData.userEmail,
