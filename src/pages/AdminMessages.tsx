@@ -23,16 +23,7 @@ import {
   type UserMessage,
 } from "@/integrations/supabase/userMessages";
 
-interface ContactMessage {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  subject: string;
-  message: string;
-  createdAt: string;
-  status: "unread" | "read" | "replied";
-}
+// Using UserMessage interface from service
 
 const AdminMessages = () => {
   const navigate = useNavigate();
