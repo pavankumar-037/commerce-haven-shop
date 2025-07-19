@@ -10,6 +10,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import OrderSuccess from "./pages/OrderSuccess";
 import PaymentError from "./pages/PaymentError";
 import Orders from "./pages/Orders";
