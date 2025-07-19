@@ -223,6 +223,8 @@ CREATE POLICY "Allow all operations" ON public.orders FOR ALL USING (true);
           .select()
           .single();
 
+        console.log("Old schema attempt result:", result);
+
         data = result.data;
         error = result.error;
       }
