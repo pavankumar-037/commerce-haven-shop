@@ -178,6 +178,9 @@ CREATE POLICY "Allow all operations" ON public.orders FOR ALL USING (true);
         paymentMethod: orderData.paymentMethod,
       });
 
+      // Generate a unique order number
+      const orderNumber = generateOrderNumber();
+
       // Try to create order with new schema first (more minimal)
       const newSchemaOrder = {
         user_email: orderData.userEmail,
@@ -186,6 +189,7 @@ CREATE POLICY "Allow all operations" ON public.orders FOR ALL USING (true);
         payment_method: orderData.paymentMethod,
         payment_status: "pending",
         order_status: "pending",
+        order_number: orderNumber,
       };
 
       console.log(
