@@ -1,20 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, ShoppingCart, User, Star, Filter, Gift, LogOut, Package } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { useCart } from '@/hooks/useCart';
-import ComboOffers from '@/components/ComboOffers';
-import HeroCarousel from '@/components/HeroCarousel';
-import DynamicOffersSection from '@/components/DynamicOffersSection';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import {
+  Search,
+  ShoppingCart,
+  User,
+  Star,
+  Filter,
+  Gift,
+  LogOut,
+  Package,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/hooks/useCart";
+import ComboOffers from "@/components/ComboOffers";
+import HeroCarousel from "@/components/HeroCarousel";
+import DynamicOffersSection from "@/components/DynamicOffersSection";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [products, setProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [showComboOffers, setShowComboOffers] = useState(false);
   const [siteSettings, setSiteSettings] = useState(null);
   const [themeSettings, setThemeSettings] = useState(null);
@@ -27,20 +36,23 @@ const Index = () => {
       title: "Curated Elegance",
       subtitle: "For Every Occasion - Traditional & Modern Wear",
       bgGradient: "from-amber-200/80 via-orange-200/80 to-yellow-300/80",
-      overlayGradient: "bg-gradient-to-br from-amber-50/90 via-orange-50/80 to-yellow-100/90"
+      overlayGradient:
+        "bg-gradient-to-br from-amber-50/90 via-orange-50/80 to-yellow-100/90",
     },
     {
       title: "Trending Now",
       subtitle: "Discover the Latest Fashion Collections",
       bgGradient: "from-slate-300/80 via-stone-200/80 to-neutral-300/80",
-      overlayGradient: "bg-gradient-to-br from-slate-50/90 via-stone-50/80 to-neutral-100/90"
+      overlayGradient:
+        "bg-gradient-to-br from-slate-50/90 via-stone-50/80 to-neutral-100/90",
     },
     {
       title: "Festival Special",
       subtitle: "Celebrate in Style with Premium Ethnic Wear",
       bgGradient: "from-rose-200/80 via-pink-200/80 to-red-300/80",
-      overlayGradient: "bg-gradient-to-br from-rose-50/90 via-pink-50/80 to-red-100/90"
-    }
+      overlayGradient:
+        "bg-gradient-to-br from-rose-50/90 via-pink-50/80 to-red-100/90",
+    },
   ];
 
   const [heroSlides, setHeroSlides] = useState(defaultHeroSlides);
@@ -48,36 +60,43 @@ const Index = () => {
   useEffect(() => {
     // Check authentication status
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setUser(session?.user || null);
     };
-    
+
     checkAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user || null);
     });
 
     // Close dropdown when clicking outside
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (showUserDropdown && !target.closest('.user-dropdown')) {
+      if (showUserDropdown && !target.closest(".user-dropdown")) {
         setShowUserDropdown(false);
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
 
     // Load site settings and theme settings
     const loadSettings = async () => {
-      const savedSettings = localStorage.getItem('siteSettings');
+      const savedSettings = localStorage.getItem("siteSettings");
       if (savedSettings) {
         const settings = JSON.parse(savedSettings);
         setSiteSettings(settings);
-        
+
         // Use admin-controlled carousel slides if available
-        if (settings.appearance?.carouselSlides && settings.appearance.carouselSlides.length > 0) {
+        if (
+          settings.appearance?.carouselSlides &&
+          settings.appearance.carouselSlides.length > 0
+        ) {
           setHeroSlides(settings.appearance.carouselSlides);
         }
       }
@@ -85,25 +104,25 @@ const Index = () => {
       // Fetch theme settings from Supabase
       try {
         const { data } = await supabase
-          .from('theme_settings')
-          .select('*')
-          .order('created_at', { ascending: false })
+          .from("theme_settings")
+          .select("*")
+          .order("created_at", { ascending: false })
           .limit(1)
           .single();
-        
+
         if (data) {
           setThemeSettings(data);
           applyThemeToDOM(data);
         }
       } catch (error) {
-        console.error('Error fetching theme settings:', error);
+        console.error("Error fetching theme settings:", error);
       }
     };
 
     loadSettings();
 
     // Load products
-    const adminProducts = localStorage.getItem('adminProducts');
+    const adminProducts = localStorage.getItem("adminProducts");
     if (adminProducts) {
       const parsedProducts = JSON.parse(adminProducts);
       setProducts(parsedProducts);
@@ -118,9 +137,10 @@ const Index = () => {
           image: "/lovable-uploads/c2e7033c-24d2-4791-8ec2-f68e1ea2b10d.png",
           category: "Men",
           rating: 4.8,
-          description: "Premium cream silk kurta with matching pajama, perfect for weddings",
+          description:
+            "Premium cream silk kurta with matching pajama, perfect for weddings",
           discount: 34,
-          inStock: true
+          inStock: true,
         },
         {
           id: 2,
@@ -132,7 +152,7 @@ const Index = () => {
           rating: 4.7,
           description: "Elegant black bandhgala with intricate embroidery",
           discount: 33,
-          inStock: true
+          inStock: true,
         },
         {
           id: 3,
@@ -144,7 +164,7 @@ const Index = () => {
           rating: 4.6,
           description: "Contemporary navy Nehru jacket for modern gentlemen",
           discount: 24,
-          inStock: true
+          inStock: true,
         },
         {
           id: 4,
@@ -156,7 +176,7 @@ const Index = () => {
           rating: 4.9,
           description: "Luxurious maroon velvet sherwani with gold detailing",
           discount: 31,
-          inStock: true
+          inStock: true,
         },
         // Women's Collection
         {
@@ -169,7 +189,7 @@ const Index = () => {
           rating: 4.9,
           description: "Stunning red silk saree with golden embellishments",
           discount: 33,
-          inStock: true
+          inStock: true,
         },
         {
           id: 6,
@@ -181,7 +201,7 @@ const Index = () => {
           rating: 4.8,
           description: "Beautiful pink lehenga with intricate mirror work",
           discount: 30,
-          inStock: true
+          inStock: true,
         },
         {
           id: 7,
@@ -193,7 +213,7 @@ const Index = () => {
           rating: 4.7,
           description: "Elegant green Anarkali suit with golden work",
           discount: 30,
-          inStock: true
+          inStock: true,
         },
         {
           id: 8,
@@ -205,7 +225,7 @@ const Index = () => {
           rating: 4.6,
           description: "Trendy sharara set in royal blue with heavy dupatta",
           discount: 28,
-          inStock: true
+          inStock: true,
         },
         {
           id: 9,
@@ -217,7 +237,7 @@ const Index = () => {
           rating: 4.9,
           description: "Traditional Banarasi saree in golden with zari work",
           discount: 33,
-          inStock: true
+          inStock: true,
         },
         // Kids Collection
         {
@@ -230,7 +250,7 @@ const Index = () => {
           rating: 4.5,
           description: "Adorable dhoti kurta set for little boys",
           discount: 32,
-          inStock: true
+          inStock: true,
         },
         {
           id: 11,
@@ -242,7 +262,7 @@ const Index = () => {
           rating: 4.6,
           description: "Beautiful lehenga choli for little princesses",
           discount: 30,
-          inStock: true
+          inStock: true,
         },
         {
           id: 12,
@@ -254,7 +274,7 @@ const Index = () => {
           rating: 4.4,
           description: "Stylish party wear suit for kids",
           discount: 33,
-          inStock: true
+          inStock: true,
         },
         // Accessories
         {
@@ -267,7 +287,7 @@ const Index = () => {
           rating: 4.3,
           description: "Handcrafted traditional juttis with embroidery",
           discount: 31,
-          inStock: true
+          inStock: true,
         },
         {
           id: 14,
@@ -279,7 +299,7 @@ const Index = () => {
           rating: 4.5,
           description: "Premium silk stoles in various colors",
           discount: 30,
-          inStock: true
+          inStock: true,
         },
         {
           id: 15,
@@ -291,24 +311,24 @@ const Index = () => {
           rating: 4.4,
           description: "Elegant designer handbag for ethnic wear",
           discount: 32,
-          inStock: true
-        }
+          inStock: true,
+        },
       ];
       setProducts(defaultProducts);
-      localStorage.setItem('adminProducts', JSON.stringify(defaultProducts));
+      localStorage.setItem("adminProducts", JSON.stringify(defaultProducts));
     }
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
       subscription.unsubscribe();
     };
   }, [showUserDropdown]);
 
   const applyThemeToDOM = (theme: any) => {
     if (!theme) return;
-    
+
     const root = document.documentElement;
-    
+
     // Convert hex to HSL for CSS variables
     const hexToHsl = (hex: string) => {
       const r = parseInt(hex.slice(1, 3), 16) / 255;
@@ -317,19 +337,28 @@ const Index = () => {
 
       const max = Math.max(r, g, b);
       const min = Math.min(r, g, b);
-      let h, s, l = (max + min) / 2;
+      let h,
+        s,
+        l = (max + min) / 2;
 
       if (max === min) {
         h = s = 0;
       } else {
         const d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        
+
         switch (max) {
-          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-          case g: h = (b - r) / d + 2; break;
-          case b: h = (r - g) / d + 4; break;
-          default: h = 0;
+          case r:
+            h = (g - b) / d + (g < b ? 6 : 0);
+            break;
+          case g:
+            h = (b - r) / d + 2;
+            break;
+          case b:
+            h = (r - g) / d + 4;
+            break;
+          default:
+            h = 0;
         }
         h /= 6;
       }
@@ -338,17 +367,20 @@ const Index = () => {
     };
 
     // Apply theme colors as CSS variables
-    root.style.setProperty('--primary', hexToHsl(theme.primary_color));
-    root.style.setProperty('--secondary', hexToHsl(theme.secondary_color));
-    root.style.setProperty('--background', hexToHsl(theme.background_color));
-    root.style.setProperty('--accent', hexToHsl(theme.accent_color));
+    root.style.setProperty("--primary", hexToHsl(theme.primary_color));
+    root.style.setProperty("--secondary", hexToHsl(theme.secondary_color));
+    root.style.setProperty("--background", hexToHsl(theme.background_color));
+    root.style.setProperty("--accent", hexToHsl(theme.accent_color));
   };
 
-  const categories = ['All', 'Men', 'Women', 'Kids', 'Accessories'];
+  const categories = ["All", "Men", "Women", "Kids", "Accessories"];
 
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "All" || product.category === selectedCategory;
     return matchesSearch && matchesCategory && product.inStock;
   });
 
@@ -357,10 +389,12 @@ const Index = () => {
   };
 
   const handleTrendingClick = () => {
-    if (siteSettings?.appearance?.trendingCollectionLink?.startsWith('#')) {
-      const element = document.querySelector(siteSettings.appearance.trendingCollectionLink);
+    if (siteSettings?.appearance?.trendingCollectionLink?.startsWith("#")) {
+      const element = document.querySelector(
+        siteSettings.appearance.trendingCollectionLink,
+      );
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        element.scrollIntoView({ behavior: "smooth" });
       }
     } else if (siteSettings?.appearance?.trendingCollectionLink) {
       window.location.href = siteSettings.appearance.trendingCollectionLink;
@@ -368,7 +402,7 @@ const Index = () => {
   };
 
   const handleOffersClick = () => {
-    if (siteSettings?.appearance?.offerCollectionLink?.startsWith('#')) {
+    if (siteSettings?.appearance?.offerCollectionLink?.startsWith("#")) {
       setShowComboOffers(true);
     } else if (siteSettings?.appearance?.offerCollectionLink) {
       window.location.href = siteSettings.appearance.offerCollectionLink;
@@ -378,14 +412,23 @@ const Index = () => {
   };
 
   // Dynamic color styling based on admin settings or theme settings
-  const primaryColor = themeSettings?.primary_color || siteSettings?.appearance?.primaryColor || '#f59e0b';
-  const secondaryColor = themeSettings?.secondary_color || siteSettings?.appearance?.secondaryColor || '#78716c';
-  const accentColor = themeSettings?.accent_color || siteSettings?.appearance?.accentColor || '#ea580c';
+  const primaryColor =
+    themeSettings?.primary_color ||
+    siteSettings?.appearance?.primaryColor ||
+    "#f59e0b";
+  const secondaryColor =
+    themeSettings?.secondary_color ||
+    siteSettings?.appearance?.secondaryColor ||
+    "#78716c";
+  const accentColor =
+    themeSettings?.accent_color ||
+    siteSettings?.appearance?.accentColor ||
+    "#ea580c";
 
   const handleScrollToProducts = () => {
-    const element = document.getElementById('products-section');
+    const element = document.getElementById("products-section");
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -398,7 +441,7 @@ const Index = () => {
         description: "Come back soon!",
       });
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error("Sign out error:", error);
     }
   };
 
@@ -425,10 +468,10 @@ const Index = () => {
       {/* Header */}
       <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-stone-200 sticky top-0 z-40">
         {siteSettings?.appearance?.showPromoBanner && (
-          <div 
+          <div
             className="text-white text-center py-2 text-sm font-medium dynamic-gradient"
-            style={{ 
-              background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)` 
+            style={{
+              background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
             }}
           >
             {siteSettings.appearance.promoBanner}
@@ -438,10 +481,10 @@ const Index = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="text-2xl font-bold text-stone-800">
-                {siteSettings?.general?.siteName || 'StyleHub'}
+                {siteSettings?.general?.siteName || "StyleHub"}
               </Link>
             </div>
-            
+
             {/* Search Bar */}
             <div className="flex-1 max-w-lg mx-8">
               <div className="relative">
@@ -458,21 +501,27 @@ const Index = () => {
 
             {/* Navigation */}
             <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 onClick={handleOffersClick}
                 className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 font-medium"
               >
                 <Gift className="w-5 h-5 mr-2" />
                 Offers
               </Button>
-              <Link to="/track-order" className="text-stone-600 hover:text-amber-600 text-sm font-medium">
+              <Link
+                to="/track-order"
+                className="text-stone-600 hover:text-amber-600 text-sm font-medium"
+              >
                 Track Order
               </Link>
-              <Link to="/contact" className="text-stone-600 hover:text-amber-600 text-sm font-medium">
+              <Link
+                to="/contact"
+                className="text-stone-600 hover:text-amber-600 text-sm font-medium"
+              >
                 Contact
               </Link>
-              
+
               {/* User Authentication Dropdown */}
               <div className="relative user-dropdown">
                 {user ? (
@@ -484,18 +533,28 @@ const Index = () => {
                     >
                       <User className="w-6 h-6" />
                     </Button>
-                    
+
                     {showUserDropdown && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-stone-200 z-50">
                         <div className="p-3 border-b border-stone-200">
                           <p className="text-sm font-medium text-stone-900 truncate">
                             {user.user_metadata?.name || user.email}
                           </p>
-                          <p className="text-xs text-stone-500 truncate">{user.email}</p>
+                          <p className="text-xs text-stone-500 truncate">
+                            {user.email}
+                          </p>
                         </div>
                         <div className="py-1">
-                          <Link 
-                            to="/orders" 
+                          <Link
+                            to="/profile"
+                            className="flex items-center px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            <User className="w-4 h-4 mr-2" />
+                            My Profile
+                          </Link>
+                          <Link
+                            to="/orders"
                             className="flex items-center px-3 py-2 text-sm text-stone-700 hover:bg-stone-50"
                             onClick={() => setShowUserDropdown(false)}
                           >
@@ -514,8 +573,8 @@ const Index = () => {
                     )}
                   </div>
                 ) : (
-                  <Link 
-                    to="/auth" 
+                  <Link
+                    to="/auth"
                     className="text-stone-600 hover:text-amber-600 flex items-center text-sm font-medium"
                   >
                     <User className="w-5 h-5 mr-1" />
@@ -523,7 +582,10 @@ const Index = () => {
                   </Link>
                 )}
               </div>
-              <Link to="/cart" className="relative text-stone-600 hover:text-amber-600">
+              <Link
+                to="/cart"
+                className="relative text-stone-600 hover:text-amber-600"
+              >
                 <ShoppingCart className="w-6 h-6" />
                 {getCartItemsCount() > 0 && (
                   <Badge className="absolute -top-2 -right-2 w-5 h-5 rounded-full p-0 flex items-center justify-center text-xs bg-orange-500 text-white">
@@ -552,14 +614,14 @@ const Index = () => {
         subtitle="Handpicked premium collections for discerning tastes"
         className="bg-gradient-to-br from-amber-50/50 to-orange-50/50"
       />
-      
+
       <DynamicOffersSection
         category="trending"
         title="Trending Now"
         subtitle="Discover what's popular and in demand"
         className="bg-gradient-to-br from-slate-50/50 to-stone-50/50"
       />
-      
+
       <DynamicOffersSection
         category="festival"
         title="Festival Special"
@@ -573,20 +635,24 @@ const Index = () => {
         <div className="flex items-center space-x-4 mb-8 overflow-x-auto bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-md border border-stone-200">
           <Filter className="w-5 h-5 text-stone-600 flex-shrink-0 ml-4" />
           <div className="flex space-x-2">
-            {categories.map(category => (
+            {categories.map((category) => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setSelectedCategory(category)}
                 className={`whitespace-nowrap rounded-full ${
-                  selectedCategory === category 
-                    ? 'text-white' 
-                    : 'hover:bg-stone-100 text-stone-700'
+                  selectedCategory === category
+                    ? "text-white"
+                    : "hover:bg-stone-100 text-stone-700"
                 }`}
-                style={selectedCategory === category ? {
-                  background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`
-                } : {}}
+                style={
+                  selectedCategory === category
+                    ? {
+                        background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
+                      }
+                    : {}
+                }
               >
                 {category}
               </Button>
@@ -596,61 +662,76 @@ const Index = () => {
 
         {/* Products Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {filteredProducts.map(product => (
-            <div key={product.id} className="bg-white/90 backdrop-blur-sm rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 group border border-stone-200/50">
+          {filteredProducts.map((product) => (
+            <div
+              key={product.id}
+              className="bg-white/90 backdrop-blur-sm rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 group border border-stone-200/50"
+            >
               {product.discount && (
                 <div className="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
                   {product.discount}% OFF
                 </div>
               )}
-              
+
               <Link to={`/product/${product.id}`}>
                 <div className="relative overflow-hidden">
-                  <img 
-                    src={product.image} 
+                  <img
+                    src={product.image}
                     alt={product.name}
                     className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </Link>
-              
+
               <div className="p-4">
                 <Link to={`/product/${product.id}`}>
                   <h3 className="font-semibold text-sm mb-2 hover:text-amber-600 transition-colors line-clamp-2 text-stone-800">
                     {product.name}
                   </h3>
                 </Link>
-                
+
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center">
                     <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                    <span className="text-xs text-stone-600 ml-1">{product.rating?.toFixed(1) || '4.0'}</span>
+                    <span className="text-xs text-stone-600 ml-1">
+                      {product.rating?.toFixed(1) || "4.0"}
+                    </span>
                   </div>
-                  <Badge variant="secondary" className="text-xs bg-stone-100 text-stone-700 border-stone-300">
+                  <Badge
+                    variant="secondary"
+                    className="text-xs bg-stone-100 text-stone-700 border-stone-300"
+                  >
                     {product.category}
                   </Badge>
                 </div>
-                
+
                 <div className="mb-4">
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg font-bold" style={{ color: primaryColor }}>₹{product.price}</span>
+                    <span
+                      className="text-lg font-bold"
+                      style={{ color: primaryColor }}
+                    >
+                      ₹{product.price}
+                    </span>
                     {product.originalPrice && (
-                      <span className="text-sm text-stone-500 line-through">₹{product.originalPrice}</span>
+                      <span className="text-sm text-stone-500 line-through">
+                        ₹{product.originalPrice}
+                      </span>
                     )}
                   </div>
                 </div>
-                
-                <Button 
+
+                <Button
                   onClick={() => handleAddToCart(product)}
                   className="w-full text-xs py-2 text-white rounded-lg font-semibold"
-                  style={{ 
-                    background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)` 
+                  style={{
+                    background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
                   }}
                   size="sm"
                   disabled={!product.inStock}
                 >
-                  {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                  {product.inStock ? "Add to Cart" : "Out of Stock"}
                 </Button>
               </div>
             </div>
@@ -660,9 +741,14 @@ const Index = () => {
         {filteredProducts.length === 0 && (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🔍</div>
-            <p className="text-stone-500 text-xl">No products found matching your search.</p>
-            <Button 
-              onClick={() => {setSearchTerm(''); setSelectedCategory('All');}}
+            <p className="text-stone-500 text-xl">
+              No products found matching your search.
+            </p>
+            <Button
+              onClick={() => {
+                setSearchTerm("");
+                setSelectedCategory("All");
+              }}
               style={{ backgroundColor: primaryColor }}
               className="mt-4 text-white"
             >
@@ -675,20 +761,37 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-gradient-to-r from-stone-800 to-slate-800 text-white py-16 mt-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h3 className="text-3xl font-bold mb-4" style={{ color: primaryColor }}>
-            {siteSettings?.general?.siteName || 'StyleHub'}
+          <h3
+            className="text-3xl font-bold mb-4"
+            style={{ color: primaryColor }}
+          >
+            {siteSettings?.general?.siteName || "StyleHub"}
           </h3>
           <p className="text-stone-300 mb-8 text-lg">
-            {siteSettings?.general?.siteDescription || 'Your trusted partner for authentic fashion'}
+            {siteSettings?.general?.siteDescription ||
+              "Your trusted partner for authentic fashion"}
           </p>
           <div className="flex justify-center space-x-8 mb-6 text-sm">
-            <Link to="/track-order" className="text-stone-300 hover:text-amber-400 transition-colors">Track Order</Link>
+            <Link
+              to="/track-order"
+              className="text-stone-300 hover:text-amber-400 transition-colors"
+            >
+              Track Order
+            </Link>
             <span className="text-stone-500">•</span>
-            <Link to="/contact" className="text-stone-300 hover:text-amber-400 transition-colors">Contact Us</Link>
+            <Link
+              to="/contact"
+              className="text-stone-300 hover:text-amber-400 transition-colors"
+            >
+              Contact Us
+            </Link>
             <span className="text-stone-500">•</span>
             <span className="text-stone-300">24/7 Support</span>
           </div>
-          <Link to="/admin/login" className="text-stone-400 text-sm hover:text-amber-400 transition-colors">
+          <Link
+            to="/admin/login"
+            className="text-stone-400 text-sm hover:text-amber-400 transition-colors"
+          >
             Admin Portal
           </Link>
         </div>

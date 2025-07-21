@@ -1,71 +1,119 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  Mail, 
-  Search, 
-  Trash2, 
-  Eye, 
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Mail,
+  Search,
+  Trash2,
+  Eye,
   Reply,
   Clock,
   CheckCircle,
-  Filter
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import AdminSidebar from '@/components/AdminSidebar';
-import { useToast } from '@/hooks/use-toast';
+  Filter,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import AdminSidebar from "@/components/AdminSidebar";
+import { useToast } from "@/hooks/use-toast";
+import {
+  userMessagesService,
+  type UserMessage,
+} from "@/integrations/supabase/userMessages";
 
-interface ContactMessage {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  subject: string;
-  message: string;
-  createdAt: string;
-  status: 'unread' | 'read' | 'replied';
-}
+// Using UserMessage interface from service
 
 const AdminMessages = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [messages, setMessages] = useState<ContactMessage[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [messages, setMessages] = useState<UserMessage[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedMessage, setSelectedMessage] = useState<UserMessage | null>(
+    null,
+  );
   const [showReplyForm, setShowReplyForm] = useState(false);
-  const [replyText, setReplyText] = useState('');
+  const [replyText, setReplyText] = useState("");
 
   useEffect(() => {
-    const adminAuth = localStorage.getItem('adminAuth');
+    const adminAuth = localStorage.getItem("adminAuth");
     if (!adminAuth) {
-      navigate('/admin/login');
+      navigate("/admin/login");
       return;
     }
 
-    const savedMessages = localStorage.getItem('contactMessages');
-    if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
-    }
+    loadMessages();
   }, [navigate]);
 
-  const filteredMessages = messages.filter(message => {
-    const matchesSearch = 
+  const loadMessages = async () => {
+    try {
+      const { data, error } = await userMessagesService.getAllMessages();
+
+      if (data && !error) {
+        setMessages(data);
+      } else {
+        // Fallback to localStorage
+        const savedMessages = localStorage.getItem("contactMessages");
+        if (savedMessages) {
+          const localMessages = JSON.parse(savedMessages).map((msg: any) => ({
+            id: msg.id,
+            user_id: msg.userId,
+            name: msg.name,
+            email: msg.email,
+            subject: msg.subject || "General Inquiry",
+            message: msg.message,
+            status: msg.status || "unread",
+            admin_reply: msg.adminReply,
+            admin_reply_at: msg.adminReplyAt,
+            admin_replied_by: msg.adminRepliedBy,
+            is_authenticated: msg.isAuthenticated || false,
+            created_at: msg.createdAt,
+            updated_at: msg.createdAt,
+          }));
+          setMessages(localMessages);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading messages:", error);
+      // Fallback to localStorage
+      const savedMessages = localStorage.getItem("contactMessages");
+      if (savedMessages) {
+        const localMessages = JSON.parse(savedMessages).map((msg: any) => ({
+          id: msg.id,
+          user_id: msg.userId,
+          name: msg.name,
+          email: msg.email,
+          subject: msg.subject || "General Inquiry",
+          message: msg.message,
+          status: msg.status || "unread",
+          admin_reply: msg.adminReply,
+          admin_reply_at: msg.adminReplyAt,
+          admin_replied_by: msg.adminRepliedBy,
+          is_authenticated: msg.isAuthenticated || false,
+          created_at: msg.createdAt,
+          updated_at: msg.createdAt,
+        }));
+        setMessages(localMessages);
+      }
+    }
+  };
+
+  const filteredMessages = messages.filter((message) => {
+    const matchesSearch =
       message.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       message.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       message.subject.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = selectedStatus === 'all' || message.status === selectedStatus;
+    const matchesStatus =
+      selectedStatus === "all" || message.status === selectedStatus;
     return matchesSearch && matchesStatus;
   });
 
   const handleDeleteMessage = (messageId: string) => {
-    const updatedMessages = messages.filter(m => m.id !== messageId);
+    const updatedMessages = messages.filter((m) => m.id !== messageId);
     setMessages(updatedMessages);
-    localStorage.setItem('contactMessages', JSON.stringify(updatedMessages));
+    localStorage.setItem("contactMessages", JSON.stringify(updatedMessages));
     toast({
       title: "Message Deleted",
       description: "Message has been removed successfully",
@@ -73,16 +121,16 @@ const AdminMessages = () => {
   };
 
   const handleMarkAsRead = (messageId: string) => {
-    const updatedMessages = messages.map(m => 
-      m.id === messageId ? { ...m, status: 'read' as const } : m
+    const updatedMessages = messages.map((m) =>
+      m.id === messageId ? { ...m, status: "read" as const } : m,
     );
     setMessages(updatedMessages);
-    localStorage.setItem('contactMessages', JSON.stringify(updatedMessages));
+    localStorage.setItem("contactMessages", JSON.stringify(updatedMessages));
   };
 
   const handleViewMessage = (message: ContactMessage) => {
     setSelectedMessage(message);
-    if (message.status === 'unread') {
+    if (message.status === "unread") {
       handleMarkAsRead(message.id);
     }
   };
@@ -90,53 +138,65 @@ const AdminMessages = () => {
   const handleSendReply = () => {
     if (!selectedMessage || !replyText.trim()) return;
 
-    const updatedMessages = messages.map(m => 
-      m.id === selectedMessage.id ? { ...m, status: 'replied' as const } : m
+    const updatedMessages = messages.map((m) =>
+      m.id === selectedMessage.id ? { ...m, status: "replied" as const } : m,
     );
     setMessages(updatedMessages);
-    localStorage.setItem('contactMessages', JSON.stringify(updatedMessages));
+    localStorage.setItem("contactMessages", JSON.stringify(updatedMessages));
 
     toast({
       title: "Reply Sent",
       description: `Reply sent to ${selectedMessage.email}`,
     });
 
-    setReplyText('');
+    setReplyText("");
     setShowReplyForm(false);
     setSelectedMessage(null);
   };
 
-  const getStatusColor = (status: ContactMessage['status']) => {
+  const getStatusColor = (status: ContactMessage["status"]) => {
     switch (status) {
-      case 'unread': return 'bg-blue-500';
-      case 'read': return 'bg-yellow-500';
-      case 'replied': return 'bg-green-500';
-      default: return 'bg-gray-500';
+      case "unread":
+        return "bg-blue-500";
+      case "read":
+        return "bg-yellow-500";
+      case "replied":
+        return "bg-green-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
-  const getStatusIcon = (status: ContactMessage['status']) => {
+  const getStatusIcon = (status: ContactMessage["status"]) => {
     switch (status) {
-      case 'unread': return Clock;
-      case 'read': return Eye;
-      case 'replied': return CheckCircle;
-      default: return Clock;
+      case "unread":
+        return Clock;
+      case "read":
+        return Eye;
+      case "replied":
+        return CheckCircle;
+      default:
+        return Clock;
     }
   };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar />
-      
+
       <div className="flex-1 p-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Contact Messages</h1>
-            <p className="text-gray-600">Manage customer inquiries and support requests</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Contact Messages
+            </h1>
+            <p className="text-gray-600">
+              Manage customer inquiries and support requests
+            </p>
           </div>
           <div className="flex items-center space-x-2">
             <Badge variant="secondary">
-              {messages.filter(m => m.status === 'unread').length} Unread
+              {messages.filter((m) => m.status === "unread").length} Unread
             </Badge>
           </div>
         </div>
@@ -181,15 +241,24 @@ const AdminMessages = () => {
             {filteredMessages.map((message) => {
               const StatusIcon = getStatusIcon(message.status);
               return (
-                <Card key={message.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card
+                  key={message.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                >
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{message.name}</h3>
+                        <h3 className="font-semibold text-lg">
+                          {message.name}
+                        </h3>
                         <p className="text-sm text-gray-600">{message.email}</p>
-                        <p className="text-sm font-medium text-gray-800 mt-1">{message.subject}</p>
+                        <p className="text-sm font-medium text-gray-800 mt-1">
+                          {message.subject}
+                        </p>
                       </div>
-                      <Badge className={`${getStatusColor(message.status)} text-white`}>
+                      <Badge
+                        className={`${getStatusColor(message.status)} text-white`}
+                      >
                         <StatusIcon className="w-3 h-3 mr-1" />
                         {message.status}
                       </Badge>
@@ -226,8 +295,12 @@ const AdminMessages = () => {
             {filteredMessages.length === 0 && (
               <div className="text-center py-12">
                 <Mail className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">No messages found</h3>
-                <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                  No messages found
+                </h3>
+                <p className="text-gray-500">
+                  Try adjusting your search or filter criteria
+                </p>
               </div>
             )}
           </div>
@@ -250,7 +323,9 @@ const AdminMessages = () => {
                 <div>
                   <Label htmlFor="sender">From</Label>
                   <p className="font-medium">{selectedMessage.name}</p>
-                  <p className="text-sm text-gray-600">{selectedMessage.email}</p>
+                  <p className="text-sm text-gray-600">
+                    {selectedMessage.email}
+                  </p>
                 </div>
 
                 <div>
@@ -280,7 +355,7 @@ const AdminMessages = () => {
                 </div>
 
                 {!showReplyForm ? (
-                  <Button 
+                  <Button
                     onClick={() => setShowReplyForm(true)}
                     className="w-full"
                   >
@@ -301,11 +376,11 @@ const AdminMessages = () => {
                       <Button onClick={handleSendReply} className="flex-1">
                         Send Reply
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         onClick={() => {
                           setShowReplyForm(false);
-                          setReplyText('');
+                          setReplyText("");
                         }}
                       >
                         Cancel

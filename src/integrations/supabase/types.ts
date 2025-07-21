@@ -4,265 +4,243 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[]
+  | Json[];
 
 export type Database = {
   // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
-  }
+    PostgrestVersion: "12.2.3 (519615d)";
+  };
   public: {
     Tables: {
       offers: {
         Row: {
-          category: string
-          created_at: string | null
-          description: string | null
-          end_date: string | null
-          id: string
-          image_url: string | null
-          start_date: string | null
-          status: string | null
-          title: string
-          updated_at: string | null
-        }
+          category: string;
+          created_at: string | null;
+          description: string | null;
+          end_date: string | null;
+          id: string;
+          image_url: string | null;
+          start_date: string | null;
+          status: string | null;
+          title: string;
+          updated_at: string | null;
+        };
         Insert: {
-          category: string
-          created_at?: string | null
-          description?: string | null
-          end_date?: string | null
-          id?: string
-          image_url?: string | null
-          start_date?: string | null
-          status?: string | null
-          title: string
-          updated_at?: string | null
-        }
+          category: string;
+          created_at?: string | null;
+          description?: string | null;
+          end_date?: string | null;
+          id?: string;
+          image_url?: string | null;
+          start_date?: string | null;
+          status?: string | null;
+          title: string;
+          updated_at?: string | null;
+        };
         Update: {
-          category?: string
-          created_at?: string | null
-          description?: string | null
-          end_date?: string | null
-          id?: string
-          image_url?: string | null
-          start_date?: string | null
-          status?: string | null
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
+          category?: string;
+          created_at?: string | null;
+          description?: string | null;
+          end_date?: string | null;
+          id?: string;
+          image_url?: string | null;
+          start_date?: string | null;
+          status?: string | null;
+          title?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
       orders: {
         Row: {
-          created_at: string
-          id: string
-          items: Json
-          order_number: string
-          order_status: string
-          payment_method: string
-          payment_status: string
-          stripe_session_id: string | null
-          total_amount: number
-          updated_at: string
-          user_email: string
-        }
+          id: string;
+          user_email: string;
+          items: Json;
+          payment_method: string;
+          payment_status: string;
+          order_status: string;
+          created_at: string;
+          updated_at: string;
+          // New schema columns
+          order_number?: string;
+          total_amount?: number;
+          stripe_session_id?: string | null;
+          // Old schema columns (optional for backward compatibility)
+          customer_info?: Json;
+          subtotal?: number;
+          coupon_discount?: number;
+          shipping_cost?: number;
+          total?: number;
+          applied_coupon?: Json;
+        };
         Insert: {
-          created_at?: string
-          id?: string
-          items: Json
-          order_number: string
-          order_status?: string
-          payment_method: string
-          payment_status?: string
-          stripe_session_id?: string | null
-          total_amount: number
-          updated_at?: string
-          user_email: string
-        }
+          id?: string;
+          user_email: string;
+          items: Json;
+          payment_method: string;
+          payment_status?: string;
+          order_status?: string;
+          created_at?: string;
+          updated_at?: string;
+          // New schema columns
+          order_number?: string;
+          total_amount?: number;
+          stripe_session_id?: string | null;
+          // Old schema columns (optional for backward compatibility)
+          customer_info?: Json;
+          subtotal?: number;
+          coupon_discount?: number;
+          shipping_cost?: number;
+          total?: number;
+          applied_coupon?: Json;
+        };
         Update: {
-          created_at?: string
-          id?: string
-          items?: Json
-          order_number?: string
-          order_status?: string
-          payment_method?: string
-          payment_status?: string
-          stripe_session_id?: string | null
-          total_amount?: number
-          updated_at?: string
-          user_email?: string
-        }
-        Relationships: []
-      }
+          id?: string;
+          user_email?: string;
+          items?: Json;
+          payment_method?: string;
+          payment_status?: string;
+          order_status?: string;
+          created_at?: string;
+          updated_at?: string;
+          // New schema columns
+          order_number?: string;
+          total_amount?: number;
+          stripe_session_id?: string | null;
+          // Old schema columns (optional for backward compatibility)
+          customer_info?: Json;
+          subtotal?: number;
+          coupon_discount?: number;
+          shipping_cost?: number;
+          total?: number;
+          applied_coupon?: Json;
+        };
+        Relationships: [];
+      };
       theme_settings: {
         Row: {
-          accent_color: string | null
-          background_color: string | null
-          created_at: string | null
-          id: string
-          primary_color: string | null
-          secondary_color: string | null
-          updated_at: string | null
-        }
+          accent_color: string | null;
+          background_color: string | null;
+          created_at: string | null;
+          id: string;
+          primary_color: string | null;
+          secondary_color: string | null;
+          updated_at: string | null;
+        };
         Insert: {
-          accent_color?: string | null
-          background_color?: string | null
-          created_at?: string | null
-          id?: string
-          primary_color?: string | null
-          secondary_color?: string | null
-          updated_at?: string | null
-        }
+          accent_color?: string | null;
+          background_color?: string | null;
+          created_at?: string | null;
+          id?: string;
+          primary_color?: string | null;
+          secondary_color?: string | null;
+          updated_at?: string | null;
+        };
         Update: {
-          accent_color?: string | null
-          background_color?: string | null
-          created_at?: string | null
-          id?: string
-          primary_color?: string | null
-          secondary_color?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-    }
+          accent_color?: string | null;
+          background_color?: string | null;
+          created_at?: string | null;
+          id?: string;
+          primary_color?: string | null;
+          secondary_color?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
+    };
     Views: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Functions: {
-      generate_order_number: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-    }
+      [_ in never]: never;
+    };
     Enums: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
-
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+      [_ in never]: never;
+    };
+  };
+};
 
 export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+  PublicTableNameOrOptions extends
+    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+        Database[PublicTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R;
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
+  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
+        Database["public"]["Views"])
+    ? (Database["public"]["Tables"] &
+        Database["public"]["Views"])[PublicTableNameOrOptions] extends {
+        Row: infer R;
       }
       ? R
       : never
-    : never
+    : never;
 
 export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+  PublicTableNameOrOptions extends
+    | keyof Database["public"]["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I;
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
+  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
+    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+        Insert: infer I;
       }
       ? I
       : never
-    : never
+    : never;
 
 export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+  PublicTableNameOrOptions extends
+    | keyof Database["public"]["Tables"]
+    | { schema: keyof Database },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+> = PublicTableNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U;
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
+  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
+    ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
+        Update: infer U;
       }
       ? U
       : never
-    : never
+    : never;
 
 export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+  PublicEnumNameOrOptions extends
+    | keyof Database["public"]["Enums"]
+    | { schema: keyof Database },
+  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
+    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
-
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
-
-export const Constants = {
-  public: {
-    Enums: {},
-  },
-} as const
+> = PublicEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
+    ? Database["public"]["Enums"][PublicEnumNameOrOptions]
+    : never;

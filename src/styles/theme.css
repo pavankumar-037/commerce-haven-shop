@@ -1,0 +1,181 @@
+/* Dynamic Theme Support */
+:root {
+  /* Default theme colors - will be overridden by theme provider */
+  --primary-hex: #f59e0b;
+  --secondary-hex: #78716c;
+  --background-hex: #fafaf9;
+  --accent-hex: #ea580c;
+
+  /* CSS variables for orange variants */
+  --orange-500: var(--primary-hex);
+  --orange-600: var(--accent-hex);
+  --emerald-600: var(--secondary-hex);
+  --emerald-700: var(--secondary-hex);
+}
+
+/* Apply theme colors to specific classes */
+.bg-orange-500 {
+  background-color: var(--orange-500) !important;
+}
+
+.hover\:bg-orange-600:hover {
+  background-color: var(--orange-600) !important;
+}
+
+.bg-emerald-600 {
+  background-color: var(--emerald-600) !important;
+}
+
+.hover\:bg-emerald-700:hover {
+  background-color: var(--emerald-700) !important;
+}
+
+.text-orange-600 {
+  color: var(--orange-600) !important;
+}
+
+.border-orange-500 {
+  border-color: var(--orange-500) !important;
+}
+
+.border-orange-600 {
+  border-color: var(--orange-600) !important;
+}
+
+/* Responsive optimizations */
+@media (max-width: 640px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .admin-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Performance optimizations */
+.product-image {
+  will-change: transform;
+  transition: transform 0.2s ease-in-out;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* Lazy loading placeholder */
+.image-placeholder {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Cart and checkout optimizations */
+.checkout-form {
+  scroll-behavior: smooth;
+}
+
+.payment-option {
+  transition: all 0.2s ease-in-out;
+}
+
+.payment-option:hover {
+  background-color: #f9fafb;
+  border-color: var(--orange-500);
+}
+
+/* Toast and notification styles */
+.toast-container {
+  z-index: 9999;
+}
+
+/* Button loading states */
+.button-loading {
+  position: relative;
+  color: transparent !important;
+}
+
+.button-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Admin panel optimizations */
+.admin-table {
+  min-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .admin-table {
+    font-size: 0.875rem;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.5rem;
+  }
+}
+
+/* Form validation styles */
+.form-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444;
+}
+
+.form-success {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 1px #10b981;
+}
+
+/* Accessibility improvements */
+.focus-visible:focus {
+  outline: 2px solid var(--orange-500);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+}

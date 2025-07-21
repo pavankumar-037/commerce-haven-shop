@@ -1,16 +1,18 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "@/hooks/useTheme";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import OrderSuccess from "./pages/OrderSuccess";
+import PaymentError from "./pages/PaymentError";
 import Orders from "./pages/Orders";
 import OrderTracking from "./pages/OrderTracking";
 import ContactUs from "./pages/ContactUs";
@@ -24,42 +26,77 @@ import AdminOffers from "./pages/AdminOffers";
 import AdminCoupons from "./pages/AdminCoupons";
 import AdminMessages from "./pages/AdminMessages";
 import AdminSettings from "./pages/AdminSettings";
+import Debug from "./pages/Debug";
+import AboutUs from "./pages/AboutUs";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import FAQ from "./pages/FAQ";
+import ShippingReturns from "./pages/ShippingReturns";
+import SizeGuide from "./pages/SizeGuide";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/order-success" element={<OrderSuccess />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/track-order" element={<OrderTracking />} />
-          <Route path="/contact" element={<ContactUs />} />
-          
-          {/* Admin Routes */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/products" element={<AdminProducts />} />
-          <Route path="/admin/sections" element={<AdminSections />} />
-          <Route path="/admin/orders" element={<AdminOrders />} />
-          <Route path="/admin/offers-manager" element={<AdminOffersManager />} />
-          <Route path="/admin/offers" element={<AdminOffers />} />
-          <Route path="/admin/coupons" element={<AdminCoupons />} />
-          <Route path="/admin/messages" element={<AdminMessages />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <ErrorBoundary>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route
+                path="/checkout"
+                element={
+                  <ErrorBoundary>
+                    <Checkout />
+                  </ErrorBoundary>
+                }
+              />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/order-success" element={<OrderSuccess />} />
+              <Route path="/payment-error" element={<PaymentError />} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/track-order" element={<OrderTracking />} />
+              <Route path="/contact" element={<ContactUs />} />
+
+              {/* Admin Routes */}
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/products" element={<AdminProducts />} />
+              <Route path="/admin/sections" element={<AdminSections />} />
+              <Route path="/admin/orders" element={<AdminOrders />} />
+              <Route
+                path="/admin/offers-manager"
+                element={<AdminOffersManager />}
+              />
+              <Route path="/admin/offers" element={<AdminOffers />} />
+              <Route path="/admin/coupons" element={<AdminCoupons />} />
+              <Route path="/admin/messages" element={<AdminMessages />} />
+              <Route path="/admin/settings" element={<AdminSettings />} />
+
+              {/* Debug route for development */}
+              <Route path="/debug" element={<Debug />} />
+
+              {/* General Pages */}
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/shipping-returns" element={<ShippingReturns />} />
+              <Route path="/size-guide" element={<SizeGuide />} />
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </ErrorBoundary>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
